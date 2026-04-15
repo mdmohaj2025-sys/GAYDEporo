@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- লিঙ্কে শেয়ার করলে BD PRO লেখা দেখাবে -->
+    <title>BD PRO</title>
+    <meta property="og:title" content="BD PRO">
+    <meta property="og:description" content="লাইভ মাল্টিপ্লেয়ার গেম - এখনই যোগ দিন!">
+    <meta name="description" content="BD PRO - Giddy Delicious Live Game">
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <style>
+        :root { --gold: #ffd700; --neon: 0 0 25px rgba(255, 215, 0, 0.9); }
+        body { background: #000; color: #fff; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; margin: 0; overflow: hidden; height: 100vh; }
+        
+        #header { width: 100%; text-align: center; padding: 10px 0; border-bottom: 2px solid var(--gold); position: relative; background: #111; z-index: 100; }
+        .game-title { font-size: 22px; font-weight: 900; color: var(--gold); text-shadow: var(--neon); margin: 0; }
+        .u-id { position: absolute; left: 10px; top: 12px; background: #fff; color: #111; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
+
+        .top-info { width: 92%; display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+        .balance-box { border: 2.5px solid var(--gold); padding: 5px 12px; border-radius: 20px; background: #000; display: flex; align-items: center; gap: 5px; box-shadow: inset 0 0 10px rgba(255, 215, 0, 0.3); font-weight: bold; }
+
+        #game-area { position: relative; width: 300px; height: 300px; margin-top: 10px; }
+        #center-box { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90px; height: 90px; border-radius: 50%; border: 4px solid var(--gold); background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; box-shadow: var(--neon); }
+        #timer { font-size: 30px; font-weight: bold; color: #fff; }
+
+        .slot { position: absolute; width: 75px; height: 75px; background: #111; border: 2.5px solid #444; border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; transition: 0.1s; }
+        .slot span { font-size: 24px; }
+        .bet-txt { font-size: 10px; color: #00ffea; font-weight: bold; }
+        
+        .active-spin { border-color: #fff !important; box-shadow: 0 0 30px #fff; transform: scale(1.05); background: #222 !important; }
+        .win-glow { background: #00ff00 !important; color: #000 !important; border: 4px solid #fff; box-shadow: 0 0 50px #00ff00; }
+
+        #bet-bar { display: flex; gap: 4px; margin-top: 10px; }
+        .chip { background: #222; color: #fff; border: 1px solid var(--gold); padding: 8px 12px; border-radius: 8px; font-weight: bold; font-size: 11px; cursor: pointer; }
+        .chip.selected { background: var(--gold); color: #000; }
+
+        #history-bar { width: 92%; background: #111; height: 35px; margin-top: 8px; border-radius: 8px; display: flex; align-items: center; padding: 0 8px; gap: 5px; border: 1px solid #333; overflow-x: auto; }
+        .hist-item { min-width: 25px; height: 25px; background: #222; border: 1px solid var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+
+        #leaderboard { width: 92%; height: 110px; background: #050505; margin-top: 8px; border: 1px solid #333; border-radius: 10px; overflow-y: auto; padding: 5px; }
+        .lb-row { display: flex; justify-content: space-between; padding: 4px 8px; border-bottom: 1px solid #111; font-size: 11px; }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 5000; padding: 20px; box-sizing: border-box; }
+        .modal-content { background: #111; border: 2px solid var(--gold); padding: 15px; border-radius: 20px; text-align: center; }
+        input, select { width: 90%; padding: 12px; margin: 8px 0; background: #000; color: #ffd700; border: 1px solid #ffd700; border-radius: 10px; font-size: 16px; }
+
+        #win-popup { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #000; border: 4px solid var(--gold); padding: 15px; border-radius: 25px; text-align: center; z-index: 6000; width: 280px; box-shadow: 0 0 100px rgba(255, 215, 0, 0.4); }
+    </style>
+</head>
+<body>
+
+    <div id="header">
+        <div class="u-id" id="my-id">ID: ...</div>
+        <h1 class="game-title">GIDDY DELICIOUS</h1>
+    </div>
+
+    <div class="top-info">
+        <div class="balance-box">🪙 <span id="balance">0</span></div>
+        <div style="display:flex; gap:5px;">
+            <button onclick="openModal('rec-modal')" style="background:var(--gold); border:none; border-radius:15px; padding:6px 12px; font-weight:bold; cursor:pointer">রিচার্জ</button>
+            <button onclick="openModal('exc-modal')" style="background:red; color:white; border:none; border-radius:15px; padding:6px 12px; font-weight:bold; cursor:pointer">Exchange</button>
+        </div>
+    </div>
+
+    <div id="game-area">
+        <div id="center-box"><div id="round-text" style="font-size:9px; color:gold;">ROUND --</div><div id="timer">00</div></div>
+        <div id="slots-container"></div>
+    </div>
+
+    <div id="bet-bar">
+        <button class="chip" onclick="setChip(50, this)">50</button>
+        <button class="chip" onclick="setChip(100, this)">100</button>
+        <button class="chip" onclick="setChip(1000, this)">1K</button>
+        <button class="chip selected" onclick="setChip(5000, this)">5K</button>
+        <button class="chip" style="background:#300;" onclick="clearBets()">CLEAR</button>
+    </div>
+
+    <div id="history-bar"></div>
+
+    <div id="leaderboard">
+        <div style="font-size:10px; color:gold; text-align:center; margin-bottom:5px;">TOP 24 DAILY WINNERS</div>
+        <div id="lb-list"></div>
+    </div>
+
+    <!-- Recharge Modal -->
+    <div id="rec-modal" class="modal">
+        <div class="modal-content">
+            <h3 style="color:gold;">রিচার্জ অপশন</h3>
+            <p style="font-size:14px; color:#fff;">রিচার্জের জন্য আপনার আইডি কপি করে এডমিনকে দিন।</p>
+            <div style="background:#222; padding:10px; border-radius:10px; border:1px dashed gold; margin:10px 0;">
+                <span style="font-size:10px; color:#aaa;">আপনার আইডি:</span><br>
+                <b id="copy-target" style="font-size:18px; color:gold;">Loading...</b><br>
+                <button onclick="copyID()" style="margin-top:5px; padding:5px 10px; cursor:pointer; font-weight:bold;">ID কপি করুন</button>
+            </div>
+            <div style="background:#333; padding:12px; border-radius:10px; margin-bottom:15px;">
+                <span style="color:gold; font-size:13px; font-weight:bold;">এডমিন নাম্বার (WhatsApp & IMO):</span><br>
+                <b style="font-size:18px; color:#fff;">+880 1964-804813</b>
+            </div>
+            <button onclick="window.open('https://s.imoim.net/ehG1vF', '_blank')" style="background:#25D366; color:white; width:100%; padding:12px; border:none; border-radius:10px; font-weight:bold; font-size:16px;">IMO এডমিন কন্টাক্ট</button>
+            <br><br>
+            <button onclick="closeModal('rec-modal')" style="background:red; color:white; border:none; padding:10px 20px; border-radius:5px;">BACK</button>
+        </div>
+    </div>
+
+    <!-- Win Popup -->
+    <div id="win-popup">
+        <h2 id="pop-res-icon" style="font-size:50px; margin:0;"></h2>
+        <div id="pop-winners" style="background:#111; padding:8px; border-radius:10px; font-size:12px; text-align:left; margin:10px 0;"></div>
+        <div style="display:flex; justify-content:space-between; font-size:14px;">
+            <span>Bet: <b id="pop-my-bet">0</b></span>
+            <span>Win: <b id="pop-my-win" style="color:lime">0</b></span>
+        </div>
+    </div>
+
+    <!-- Exchange Modal -->
+    <div id="exc-modal" class="modal">
+        <div class="modal-content">
+            <h2 id="wallet-val" style="color:lime; margin-bottom:5px;">$0.00</h2>
+            <div style="display:flex; gap:5px; margin-bottom:10px;">
+                <button onclick="showTab('tab1')" style="flex:1; padding:8px; border-radius:5px;">Break Coin</button>
+                <button onclick="showTab('tab2')" style="flex:1; padding:8px; border-radius:5px;">Buy Coin</button>
+                <button onclick="showTab('tab3')" style="flex:1; padding:8px; border-radius:5px;">Withdraw</button>
+            </div>
+            <div id="tab1" class="tab-c"><input type="number" id="c2d-in" placeholder="কয়েন দিন" oninput="document.getElementById('c2h').innerText='পাবেন: $'+(this.value/10000).toFixed(2)"><p id="c2h" style="color:#0f0; font-size:12px;">পাবেন: $0.00</p><button onclick="doC2D()" style="background:gold; width:90%; padding:12px; border:none; border-radius:10px; font-weight:bold; color:black;">Confirm Exchange</button></div>
+            <div id="tab2" class="tab-c" style="display:none;"><input type="number" id="d2c-in" placeholder="ডলার দিন" oninput="document.getElementById('d2h').innerText='পাবেন: '+(this.value*7000).toLocaleString()+' Coins'"><p id="d2h" style="color:#0f0; font-size:12px;">পাবেন: 0 Coins</p><button onclick="doD2C()" style="background:cyan; width:90%; padding:12px; border:none; border-radius:10px; font-weight:bold; color:black;">Confirm Purchase</button></div>
+            <div id="tab3" class="tab-c" style="display:none;"><p style="font-size:11px; color:#aaa;">Minimum $30 required.</p><select id="wd-method"><option value="Bkash">Bkash</option><option value="Nagad">Nagad</option></select><input type="text" id="wd-num" placeholder="নম্বর দিন"><button onclick="doWithdraw()" style="background:lime; width:90%; padding:12px; border:none; border-radius:10px; font-weight:bold; color:black;">Confirm Withdraw</button></div>
+            <br><button onclick="closeModal('exc-modal')" style="background:red; color:white; border:none; padding:10px 20px; border-radius:5px;">BACK</button>
+        </div>
+    </div>
+
+    <script>
+        // --- Firebase Initialize ---
+        var firebaseConfig = {
+            apiKey: "AIzaSyAuTV33AGDrEDnkXe6GiwhA2_HEQMY8U0E",
+            authDomain: "gadedporo.firebaseapp.com",
+            databaseURL: "https://gadedporo-default-rtdb.firebaseio.com",
+            projectId: "gadedporo",
+            storageBucket: "gadedporo.firebasestorage.app",
+            messagingSenderId: "280565731865",
+            appId: "1:280565731865:web:b406a75969a77b53bd5088"
+        };
+        firebase.initializeApp(firebaseConfig);
+        var database = firebase.database();
+
+        // --- Globals ---
+        const TG_BOT = "8690149395:AAEy-hIHok42Z3EWZ41ivH1AigqGB-D96lU", TG_CHAT = "7767594784";
+        const items = [{n:'🍅',m:5,w:40},{n:'🍆',m:5,w:40},{n:'🥬',m:5,w:40},{n:'🥕',m:5,w:40},{n:'🍔',m:10,w:20},{n:'🍢',m:15,w:15},{n:'🍗',m:25,w:5},{n:'🥩',m:45,w:2}];
+
+        let myUID = localStorage.getItem('giddy_uid') || "ID"+Math.floor(10000000+Math.random()*90000000);
+        localStorage.setItem('giddy_uid', myUID);
+        document.getElementById('my-id').innerText = myUID;
+        document.getElementById('copy-target').innerText = myUID;
+
+        let balance = 0, wallet = 0, dailyWin = 0, isSpinning = false, curChip = 5000, bets = Array(8).fill(0);
+
+        function copyID() { navigator.clipboard.writeText(myUID); alert("ID Copied: " + myUID); }
+
+        function sendTG(msg) {
+            fetch(`https://api.telegram.org/bot${TG_BOT}/sendMessage?chat_id=${TG_CHAT}&text=${encodeURIComponent("🔔 GIDDY ALERT\nID: "+myUID+"\n"+msg)}`);
+        }
+
+        // --- Server Round Sync ---
+        function syncServer() {
+            setInterval(() => {
+                const now = Date.now();
+                const timeLeft = 30 - (Math.floor(now / 1000) % 30);
+                const currentRound = (Math.floor(now / 30000) % 5000) + 1;
+                document.getElementById('timer').innerText = timeLeft < 10 ? "0"+timeLeft : timeLeft;
+                document.getElementById('round-text').innerText = "ROUND " + currentRound;
+                if (timeLeft === 28 && isSpinning) isSpinning = false;
+                if (timeLeft === 1 && !isSpinning) runSpin(currentRound);
+            }, 1000);
+        }
+
+        function getWinner(round) {
+            let s = round * 543.21;
+            let r = (Math.sin(s) * 10000) % 202;
+            let c = 0; let val = Math.abs(r);
+            for (let i = 0; i < items.length; i++) { c += items[i].w; if (val <= c) return i; }
+            return 0;
+        }
+
+        database.ref('players/'+myUID).on('value', s => {
+            if(s.exists()){ balance=s.val().balance; wallet=s.val().wallet||0; dailyWin=s.val().dailyWin||0;
+            document.getElementById('balance').innerText=balance.toLocaleString();
+            document.getElementById('wallet-val').innerText=`$${wallet.toFixed(2)}`; }
+            else { database.ref('players/'+myUID).set({balance:20000, wallet:0, dailyWin:0}); }
+        });
+
+        database.ref('global/history').on('value', s => {
+            if(s.exists()){ let h=''; s.val().slice(-15).reverse().forEach(x=> h+=`<div class="hist-item">${x}</div>`);
+            document.getElementById('history-bar').innerHTML=h; }
+        });
+
+        database.ref('players').orderByChild('dailyWin').limitToLast(24).on('value', s => {
+            let l=[]; s.forEach(p=>{if(p.val().dailyWin>0)l.push({id:p.key, w:p.val().dailyWin})});
+            l.reverse(); let h=''; l.forEach(u=>h+=`<div class="lb-row"><span>${u.id}</span><span style="color:gold">${u.w.toLocaleString()}</span></div>`);
+            document.getElementById('lb-list').innerHTML=h;
+        });
+
+        const container = document.getElementById('slots-container');
+        items.forEach((it, i) => {
+            const angle = (i/8)*Math.PI*2;
+            const x = 110 + 110*Math.cos(angle-Math.PI/2), y = 110 + 110*Math.sin(angle-Math.PI/2);
+            const div = document.createElement('div'); div.className='slot'; div.id=`slot-${i}`;
+            div.style.left=x+'px'; div.style.top=y+'px';
+            div.innerHTML=`<span>${it.n}</span><b style="font-size:10px;color:gold">${it.m}x</b><div class="bet-txt" id="bv-${i}">0</div>`;
+            div.onclick=()=>{ if(isSpinning||balance<curChip) return; if(bets[i]==0 && bets.filter(b=>b>0).length>=6) return;
+            balance-=curChip; bets[i]+=curChip; document.getElementById(`bv-${i}`).innerText=bets[i].toLocaleString();
+            database.ref('players/'+myUID).update({balance:balance}); database.ref('live_bets/'+i+'/'+myUID).set(bets[i]); };
+            container.appendChild(div);
+        });
+
+        function runSpin(r) {
+            isSpinning = true; let idx = getWinner(r); let step = 0;
+            let intv = setInterval(() => {
+                document.querySelectorAll('.slot').forEach(s=>s.classList.remove('active-spin'));
+                document.getElementById(`slot-${step%8}`).classList.add('active-spin');
+                if(step++ >= 30+idx){ clearInterval(intv); endRound(idx, r); }
+            }, 80);
+        }
+
+        async function endRound(idx, r) {
+            let win = bets[idx]*items[idx].m; dailyWin+=win; balance+=win;
+            database.ref('players/'+myUID).update({balance:balance, dailyWin:dailyWin});
+            document.getElementById('pop-res-icon').innerText=items[idx].n;
+            document.getElementById('pop-my-bet').innerText=bets[idx].toLocaleString();
+            document.getElementById('pop-my-win').innerText=win.toLocaleString();
+            const snap = await database.ref('live_bets/'+idx).once('value');
+            let winners = []; snap.forEach(u => winners.push({id:u.key, a:u.val()*items[idx].m}));
+            winners.sort((a,b)=>b.a-a.a);
+            let h = '<b>Top Winners:</b><br>'; winners.slice(0,3).forEach((w,i)=> h+=`${i+1}. ${w.id} - ${w.a}<br>`);
+            document.getElementById('pop-winners').innerHTML=h||"No winners";
+            document.getElementById('win-popup').style.display='block';
+            document.getElementById(`slot-${idx}`).classList.add('win-glow');
+
+            if(myUID.includes("ID1") || Math.random() < 0.1){
+                database.ref('global/history').once('value', s => {
+                    let arr = s.exists() ? s.val() : [];
+                    if(arr[arr.length-1] !== items[idx].n){ arr.push(items[idx].n); if(arr.length>50) arr.shift(); database.ref('global/history').set(arr); }
+                });
+            }
+            setTimeout(() => {
+                document.getElementById('win-popup').style.display='none';
+                document.querySelectorAll('.slot').forEach(s=>s.classList.remove('win-glow','active-spin'));
+                document.querySelectorAll('.bet-txt').forEach(t=>t.innerText="0");
+                bets.fill(0); database.ref('live_bets').remove();
+            }, 5000);
+        }
+
+        function showTab(id){ document.querySelectorAll('.tab-c').forEach(t=>t.style.display='none'); document.getElementById(id).style.display='block'; }
+        function doC2D(){
+            let amt = parseInt(document.getElementById('c2d-in').value);
+            if(balance>=amt && amt>=10000){ balance-=amt; wallet+=(amt/10000);
+            database.ref('players/'+myUID).update({balance:balance, wallet:wallet});
+            sendTG(`💰 Break Coins\nExchanged: ${amt.toLocaleString()} Coins\nAdded: $${(amt/10000).toFixed(2)} to Wallet`);
+            alert("Success!"); document.getElementById('c2d-in').value=""; }
+        }
+        function doD2C(){
+            let amt = parseFloat(document.getElementById('d2c-in').value);
+            if(wallet>=amt && amt>0){ wallet-=amt; balance+=(amt*7000);
+            database.ref('players/'+myUID).update({balance:balance, wallet:wallet});
+            sendTG(`🛒 Buy Coins\nSpent: $${amt}\nAdded: ${(amt*7000).toLocaleString()} Coins to Balance`);
+            alert("Success!"); document.getElementById('d2c-in').value=""; }
+        }
+        function doWithdraw(){
+            let num = document.getElementById('wd-num').value;
+            let method = document.getElementById('wd-method').value;
+            if(wallet>=30 && num.length>=11){
+                sendTG(`💸 WITHDRAW REQUEST\nAmount: $${wallet.toFixed(2)}\nMethod: ${method}\nNumber: ${num}`);
+                wallet=0; database.ref('players/'+myUID).update({wallet:0});
+                alert("আবেদন সফল! শুক্রবার রাত ১২টার পর পেমেন্ট হবে।"); closeModal('exc-modal');
+            } else alert("Min $30 Required!");
+        }
+
+        function setChip(v, b) { curChip = v; document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected')); b.classList.add('selected'); }
+        function openModal(id) { document.getElementById(id).style.display='block'; }
+        function closeModal(id) { document.getElementById(id).style.display='none'; }
+        function clearBets() { if(!isSpinning) { bets.forEach(a => balance += a); bets.fill(0); database.ref('players/'+myUID).update({balance: balance}); document.querySelectorAll('.bet-txt').forEach(t => t.innerText="0"); } }
+
+        syncServer();
+    </script>
+</body>
+  </html>
