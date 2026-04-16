@@ -38,8 +38,8 @@
         .hot-border { border-color: red !important; box-shadow: 0 0 15px red !important; }
         @keyframes blink { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.1); } 100% { opacity: 1; transform: scale(1); } }
 
-        #bet-bar { display: flex; gap: 4px; margin-top: 10px; }
-        .chip { background: #222; color: #fff; border: 1px solid var(--gold); padding: 8px 12px; border-radius: 8px; font-weight: bold; font-size: 11px; cursor: pointer; }
+        #bet-bar { display: flex; gap: 4px; margin-top: 10px; flex-wrap: wrap; justify-content: center; width: 95%; }
+        .chip { background: #222; color: #fff; border: 1px solid var(--gold); padding: 7px 10px; border-radius: 8px; font-weight: bold; font-size: 10px; cursor: pointer; min-width: 45px; }
         .chip.selected { background: var(--gold); color: #000; }
 
         #history-bar { width: 92%; background: #111; height: 35px; margin-top: 8px; border-radius: 8px; display: flex; align-items: center; padding: 0 8px; gap: 5px; border: 1px solid #333; overflow-x: hidden; position: relative; }
@@ -81,6 +81,8 @@
         <button class="chip" onclick="setChip(100, this)">100</button>
         <button class="chip" onclick="setChip(1000, this)">1K</button>
         <button class="chip selected" onclick="setChip(5000, this)">5K</button>
+        <button class="chip" onclick="setChip(10000, this)">10K</button>
+        <button class="chip" onclick="setChip(50000, this)">50K</button>
         <button class="chip" style="background:#300;" onclick="clearBets()">CLEAR</button>
     </div>
 
@@ -89,19 +91,16 @@
     <div id="leaderboard">
         <div style="font-size:10px; color:gold; text-align:center; margin-bottom:5px;">TOP 24 DAILY WINNERS</div>
         <div id="lb-list"></div>
-    </div>
-
-    <div id="rec-modal" class="modal">
+    </div><div id="rec-modal" class="modal">
         <div class="modal-content">
             <h3 style="color:gold;">রিচার্জ অপশন</h3>
-            <p style="font-size:14px; color:#fff;">রিচার্জের জন্য আপনার আইডি কপি করে এডমিনকে দিন।</p>
+            <p style="font-size:14px; color:#fff;">আইডি কপি করে এডমিনকে দিন।</p>
             <div style="background:#222; padding:10px; border-radius:10px; border:1px dashed gold; margin:10px 0;">
-                <span style="font-size:10px; color:#aaa;">আপনার আইডি:</span><br>
                 <b id="copy-target" style="font-size:18px; color:gold;">Loading...</b><br>
                 <button onclick="copyID()" style="margin-top:5px; padding:5px 10px; cursor:pointer; font-weight:bold;">ID কপি করুন</button>
             </div>
             <div style="background:#333; padding:12px; border-radius:10px; margin-bottom:15px;">
-                <span style="color:gold; font-size:13px; font-weight:bold;">এডমিন নাম্বার (WhatsApp & IMO):</span><br>
+                <span style="color:gold; font-size:13px; font-weight:bold;">এডমিন নম্বর (IMO):</span><br>
                 <b style="font-size:18px; color:#fff;">+880 1964-804813</b>
             </div>
             <button onclick="window.open('https://s.imoim.net/ehG1vF', '_blank')" style="background:#25D366; color:white; width:100%; padding:12px; border:none; border-radius:10px; font-weight:bold; font-size:16px;">IMO এডমিন কন্টাক্ট</button>
@@ -145,32 +144,23 @@
             appId: "1:280565731865:web:b406a75969a77b53bd5088"
         };
         firebase.initializeApp(firebaseConfig);
-        var database = firebase.database();const TG_BOT = "8690149395:AAEy-hIHok42Z3EWZ41ivH1AigqGB-D96lU", TG_CHAT = "7767594784";
+        var database = firebase.database();
+
+        const TG_BOT = "8690149395:AAEy-hIHok42Z3EWZ41ivH1AigqGB-D96lU", TG_CHAT = "7767594784";
         const items = [{n:'🍅',m:5,w:40},{n:'🍆',m:5,w:40},{n:'🥬',m:5,w:40},{n:'🥕',m:5,w:40},{n:'🍔',m:10,w:20},{n:'🍢',m:15,w:15},{n:'🍗',m:25,w:5},{n:'🥩',m:45,w:2}];
+
         let myUID = localStorage.getItem('giddy_uid') || "ID"+Math.floor(10000000+Math.random()*90000000);
         localStorage.setItem('giddy_uid', myUID);
         document.getElementById('my-id').innerText = myUID;
         document.getElementById('copy-target').innerText = myUID;
+
         let balance = 0, wallet = 0, dailyWin = 0, isSpinning = false, curChip = 5000, bets = Array(8).fill(0);
 
-        function copyID() { navigator.clipboard.writeText(myUID); alert("ID Copied: " + myUID); }
-        function sendTG(msg) { fetch(`https://api.telegram.org/bot${TG_BOT}/sendMessage?chat_id=${TG_CHAT}&text=${encodeURIComponent("🔔 GIDDY ALERT\nID: "+myUID+"\n"+msg)}`); }
-        function setChip(amt, el) { curChip = amt; document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected')); el.classList.add('selected'); }
-        function clearBets() { if(!isSpinning) alert("Contact admin to reset bets."); }
         function openModal(id) { document.getElementById(id).style.display = 'block'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function copyID() { navigator.clipboard.writeText(myUID); alert("ID Copied!"); }
+        function setChip(amt, el) { curChip = amt; document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected')); el.classList.add('selected'); }
         function showTab(id){ document.querySelectorAll('.tab-c').forEach(t=>t.style.display='none'); document.getElementById(id).style.display='block'; }
-
-        function updateHotSlot(timeLeft) {
-            let seed = Math.floor(Date.now() / 10000);
-            let hotIdx = (seed % 8);
-            document.querySelectorAll('.slot').forEach(s => s.classList.remove('hot-border'));
-            document.querySelectorAll('.hot-label').forEach(l => l.style.display = 'none');
-            if(timeLeft > 3) {
-                let target = document.getElementById(`slot-${hotIdx}`);
-                if(target) { target.classList.add('hot-border'); target.querySelector('.hot-label').style.display = 'block'; }
-            }
-        }
 
         function syncServer() {
             setInterval(() => {
@@ -179,17 +169,19 @@
                 const currentRound = (Math.floor(now / 30000) % 5000) + 1;
                 document.getElementById('timer').innerText = timeLeft < 10 ? "0"+timeLeft : timeLeft;
                 document.getElementById('round-text').innerText = "ROUND " + currentRound;
-                if(!isSpinning) updateHotSlot(timeLeft);
+                if(!isSpinning) {
+                    let seed = Math.floor(Date.now() / 10000);
+                    let hotIdx = (seed % 8);
+                    document.querySelectorAll('.slot').forEach(s => s.classList.remove('hot-border'));
+                    document.querySelectorAll('.hot-label').forEach(l => l.style.display = 'none');
+                    if(timeLeft > 3) {
+                        let target = document.getElementById(`slot-${hotIdx}`);
+                        if(target) { target.classList.add('hot-border'); target.querySelector('.hot-label').style.display = 'block'; }
+                    }
+                }
                 if (timeLeft === 28 && isSpinning) isSpinning = false;
                 if (timeLeft === 1 && !isSpinning) runSpin(currentRound);
             }, 1000);
-        }
-
-        function getWinner(round) {
-            let s = round * 543.21; let r = (Math.sin(s) * 10000) % 202;
-            let c = 0; let val = Math.abs(r);
-            for (let i = 0; i < items.length; i++) { c += items[i].w; if (val <= c) return i; }
-            return 0;
         }
 
         database.ref('players/'+myUID).on('value', s => {
@@ -219,7 +211,6 @@
             div.innerHTML=`<div class="hot-label">HOT</div><span>${it.n}</span><b style="font-size:10px;color:gold">${it.m}x</b><div class="bet-txt" id="bv-${i}">0</div>`;
             div.onclick=()=>{ 
                 if(isSpinning||balance<curChip) return; 
-                if(bets[i]==0 && bets.filter(b=>b>0).length>=6) return;
                 balance-=curChip; bets[i]+=curChip; document.getElementById(`bv-${i}`).innerText=bets[i].toLocaleString();
                 database.ref('players/'+myUID).update({balance:balance}); 
                 database.ref('live_bets/'+i+'/'+myUID).set(bets[i]); 
@@ -228,9 +219,14 @@
         });
 
         function runSpin(r) {
-            isSpinning = true; document.querySelectorAll('.hot-label').forEach(l => l.style.display = 'none');
-            document.querySelectorAll('.slot').forEach(s => s.classList.remove('hot-border'));
-            let idx = getWinner(r); let step = 0;
+            isSpinning = true;
+            let idx = (function(round) {
+                let s = round * 543.21; let r = (Math.sin(s) * 10000) % 202;
+                let c = 0; let val = Math.abs(r);
+                for (let i = 0; i < items.length; i++) { c += items[i].w; if (val <= c) return i; }
+                return 0;
+            })(r);
+            let step = 0;
             let intv = setInterval(() => {
                 document.querySelectorAll('.slot').forEach(s=>s.classList.remove('active-spin'));
                 document.getElementById(`slot-${step%8}`).classList.add('active-spin');
@@ -245,26 +241,28 @@
             document.getElementById('pop-my-bet').innerText=bets[idx].toLocaleString();
             document.getElementById('pop-my-win').innerText=win.toLocaleString();
             const snap = await database.ref('live_bets/'+idx).once('value');
-            let winners = []; snap.forEach(u => winners.push({id:u.key, a:u.val()*items[idx].m}));
+            let winners = [];
+            snap.forEach(u => winners.push({id:u.key, a:u.val()*items[idx].m}));
             winners.sort((a,b)=>b.a-a.a);
-            let h = '<b>Top Winners:</b><br>'; winners.slice(0,3).forEach((w,i)=> h+=`${i+1}. ${w.id} - ${w.a}<br>`);
-            document.getElementById('pop-winners').innerHTML=h||"No winners";
+            let h = '<b style="color:gold;">Top 3 Winners:</b><br>';
+            winners.slice(0,3).forEach((w,i)=> h+=`<div style="display:flex; justify-content:space-between;"><span>${i+1}. ${w.id}</span> <span style="color:lime">+${w.a.toLocaleString()}</span></div>`);
+            if(winners.length === 0) h += "No winners this round";
+            document.getElementById('pop-winners').innerHTML=h;
             document.getElementById('win-popup').style.display='block';
             document.getElementById(`slot-${idx}`).classList.add('win-glow');
-            if(myUID.includes("ID1") || Math.random() < 0.1){
-                database.ref('global/history').once('value', s => {
-                    let arr = s.exists() ? s.val() : [];
-                    if(arr[arr.length-1] !== items[idx].n){ arr.push(items[idx].n); if(arr.length>30) arr.shift(); database.ref('global/history').set(arr); }
-                });
-            }
+            database.ref('global/history').once('value', s => {
+                let arr = s.exists() ? s.val() : [];
+                if(arr.length === 0 || arr[arr.length-1] !== items[idx].n){ arr.push(items[idx].n); if(arr.length>30) arr.shift(); database.ref('global/history').set(arr); }
+            });
             setTimeout(() => {
                 document.getElementById('win-popup').style.display='none';
                 document.querySelectorAll('.slot').forEach(s=>s.classList.remove('win-glow','active-spin'));
                 document.querySelectorAll('.bet-txt').forEach(t=>t.innerText="0");
-                bets.fill(0); database.ref('live_bets').remove();
+                bets.fill(0); if(myUID.includes("ID1")) database.ref('live_bets').remove(); 
             }, 5000);
         }
 
+        function sendTG(msg) { fetch(`https://api.telegram.org/bot${TG_BOT}/sendMessage?chat_id=${TG_CHAT}&text=${encodeURIComponent("🔔 GIDDY ALERT\nID: "+myUID+"\n"+msg)}`); }
         function doC2D(){
             let amt = parseInt(document.getElementById('c2d-in').value);
             if(balance>=amt && amt>=10000){ 
@@ -273,7 +271,6 @@
                 alert("Success!"); document.getElementById('c2d-in').value=""; 
             } else { alert("Min 10,000 Coins!"); }
         }
-
         function doD2C(){
             let amt = parseFloat(document.getElementById('d2c-in').value);
             if(wallet >= amt && amt > 0){
@@ -282,7 +279,6 @@
                 alert("Success!"); document.getElementById('d2c-in').value="";
             } else { alert("Insufficient Wallet!"); }
         }
-
         function doWithdraw(){
             let m = document.getElementById('wd-method').value; let n = document.getElementById('wd-num').value;
             if(wallet >= 30 && n.length >= 10){
