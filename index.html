@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <!-- লিঙ্কে শেয়ার করলে BD PRO লেখা দেখাবে -->
-    <title>BD PRO</title>
+    <title>BD PRO - GIDDY DELICIOUS</title>
     <meta property="og:title" content="BD PRO">
     <meta property="og:description" content="লাইভ মাল্টিপ্লেয়ার গেম - এখনই যোগ দিন!">
     <meta name="description" content="BD PRO - Giddy Delicious Live Game">
@@ -35,7 +34,6 @@
         .active-spin { border-color: #fff !important; box-shadow: 0 0 30px #fff; transform: scale(1.05); background: #222 !important; }
         .win-glow { background: #00ff00 !important; color: #000 !important; border: 4px solid #fff; box-shadow: 0 0 50px #00ff00; }
 
-        /* HOT Label Styles */
         .hot-label { position: absolute; top: -5px; background: red; color: white; font-size: 9px; padding: 2px 5px; border-radius: 5px; font-weight: bold; display: none; animation: blink 0.5s infinite; z-index: 20; }
         .hot-border { border-color: red !important; box-shadow: 0 0 15px red !important; }
         @keyframes blink { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.1); } 100% { opacity: 1; transform: scale(1); } }
@@ -93,7 +91,6 @@
         <div id="lb-list"></div>
     </div>
 
-    <!-- Recharge Modal -->
     <div id="rec-modal" class="modal">
         <div class="modal-content">
             <h3 style="color:gold;">রিচার্জ অপশন</h3>
@@ -113,7 +110,6 @@
         </div>
     </div>
 
-    <!-- Win Popup -->
     <div id="win-popup">
         <h2 id="pop-res-icon" style="font-size:50px; margin:0;"></h2>
         <div id="pop-winners" style="background:#111; padding:8px; border-radius:10px; font-size:12px; text-align:left; margin:10px 0;"></div>
@@ -123,7 +119,6 @@
         </div>
     </div>
 
-    <!-- Exchange Modal -->
     <div id="exc-modal" class="modal">
         <div class="modal-content">
             <h2 id="wallet-val" style="color:lime; margin-bottom:5px;">$0.00</h2>
@@ -134,13 +129,12 @@
             </div>
             <div id="tab1" class="tab-c"><input type="number" id="c2d-in" placeholder="কয়েন দিন" oninput="document.getElementById('c2h').innerText='পাবেন: $'+(this.value/10000).toFixed(2)"><p id="c2h" style="color:#0f0; font-size:12px;">পাবেন: $0.00</p><button onclick="doC2D()" style="background:gold; width:90%; padding:12px; border:none; border-radius:10px; font-weight:bold; color:black;">Confirm Exchange</button></div>
             <div id="tab2" class="tab-c" style="display:none;"><input type="number" id="d2c-in" placeholder="ডলার দিন" oninput="document.getElementById('d2h').innerText='পাবেন: '+(this.value*7000).toLocaleString()+' Coins'"><p id="d2h" style="color:#0f0; font-size:12px;">পাবেন: 0 Coins</p><button onclick="doD2C()" style="background:cyan; width:90%; padding:12px; border:none; border-radius:10px; font-weight:bold; color:black;">Confirm Purchase</button></div>
-            <div id="tab3" class="tab-c" style="display:none;"><p style="font-size:11px; color:#aaa;">Minimum $30 required.</p><select id="wd-method"><option value="Bkash">Bkash</option><option value="Nagad">Nagad</option></select><input type="text" id="wd-num" placeholder="নম্বর দিন"><button onclick="doWithdraw()" style="background:lime; width:90%; padding:12px; border:none; border-radius:10px; font-weight:bold; color:black;">Confirm Withdraw</button></div>
+            <div id="tab3" class="tab-c" style="display:none;"><p style="font-size:11px; color:#aaa;">Min $30 req.</p><select id="wd-method"><option value="Bkash">Bkash</option><option value="Nagad">Nagad</option></select><input type="text" id="wd-num" placeholder="নম্বর দিন"><button onclick="doWithdraw()" style="background:lime; width:90%; padding:12px; border:none; border-radius:10px; font-weight:bold; color:black;">Confirm Withdraw</button></div>
             <br><button onclick="closeModal('exc-modal')" style="background:red; color:white; border:none; padding:10px 20px; border-radius:5px;">BACK</button>
         </div>
     </div>
 
     <script>
-        // --- Firebase Initialize ---
         var firebaseConfig = {
             apiKey: "AIzaSyAuTV33AGDrEDnkXe6GiwhA2_HEQMY8U0E",
             authDomain: "gadedporo.firebaseapp.com",
@@ -151,44 +145,33 @@
             appId: "1:280565731865:web:b406a75969a77b53bd5088"
         };
         firebase.initializeApp(firebaseConfig);
-        var database = firebase.database();
-
-        // --- Globals ---
-        const TG_BOT = "8690149395:AAEy-hIHok42Z3EWZ41ivH1AigqGB-D96lU", TG_CHAT = "7767594784";
+        var database = firebase.database();const TG_BOT = "8690149395:AAEy-hIHok42Z3EWZ41ivH1AigqGB-D96lU", TG_CHAT = "7767594784";
         const items = [{n:'🍅',m:5,w:40},{n:'🍆',m:5,w:40},{n:'🥬',m:5,w:40},{n:'🥕',m:5,w:40},{n:'🍔',m:10,w:20},{n:'🍢',m:15,w:15},{n:'🍗',m:25,w:5},{n:'🥩',m:45,w:2}];
-
         let myUID = localStorage.getItem('giddy_uid') || "ID"+Math.floor(10000000+Math.random()*90000000);
         localStorage.setItem('giddy_uid', myUID);
         document.getElementById('my-id').innerText = myUID;
         document.getElementById('copy-target').innerText = myUID;
-
         let balance = 0, wallet = 0, dailyWin = 0, isSpinning = false, curChip = 5000, bets = Array(8).fill(0);
 
         function copyID() { navigator.clipboard.writeText(myUID); alert("ID Copied: " + myUID); }
+        function sendTG(msg) { fetch(`https://api.telegram.org/bot${TG_BOT}/sendMessage?chat_id=${TG_CHAT}&text=${encodeURIComponent("🔔 GIDDY ALERT\nID: "+myUID+"\n"+msg)}`); }
+        function setChip(amt, el) { curChip = amt; document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected')); el.classList.add('selected'); }
+        function clearBets() { if(!isSpinning) alert("Contact admin to reset bets."); }
+        function openModal(id) { document.getElementById(id).style.display = 'block'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function showTab(id){ document.querySelectorAll('.tab-c').forEach(t=>t.style.display='none'); document.getElementById(id).style.display='block'; }
 
-        function sendTG(msg) {
-            fetch(`https://api.telegram.org/bot${TG_BOT}/sendMessage?chat_id=${TG_CHAT}&text=${encodeURIComponent("🔔 GIDDY ALERT\nID: "+myUID+"\n"+msg)}`);
-        }
-
-        // --- HOT Sync Logic ---
         function updateHotSlot(timeLeft) {
-            // সবার ফোনে একই সময়ে হট ঘর দেখানোর জন্য টাইম-বেজড ক্যালকুলেশন
-            let seed = Math.floor(Date.now() / 10000); // প্রতি ১০ সেকেন্ডে পরিবর্তন
+            let seed = Math.floor(Date.now() / 10000);
             let hotIdx = (seed % 8);
-            
             document.querySelectorAll('.slot').forEach(s => s.classList.remove('hot-border'));
             document.querySelectorAll('.hot-label').forEach(l => l.style.display = 'none');
-
-            if(timeLeft > 3) { // শেষ ৩ সেকেন্ডে হট দেখাবে না
+            if(timeLeft > 3) {
                 let target = document.getElementById(`slot-${hotIdx}`);
-                if(target) {
-                    target.classList.add('hot-border');
-                    target.querySelector('.hot-label').style.display = 'block';
-                }
+                if(target) { target.classList.add('hot-border'); target.querySelector('.hot-label').style.display = 'block'; }
             }
         }
 
-        // --- Server Round Sync ---
         function syncServer() {
             setInterval(() => {
                 const now = Date.now();
@@ -196,17 +179,14 @@
                 const currentRound = (Math.floor(now / 30000) % 5000) + 1;
                 document.getElementById('timer').innerText = timeLeft < 10 ? "0"+timeLeft : timeLeft;
                 document.getElementById('round-text').innerText = "ROUND " + currentRound;
-                
                 if(!isSpinning) updateHotSlot(timeLeft);
-
                 if (timeLeft === 28 && isSpinning) isSpinning = false;
                 if (timeLeft === 1 && !isSpinning) runSpin(currentRound);
             }, 1000);
         }
 
         function getWinner(round) {
-            let s = round * 543.21;
-            let r = (Math.sin(s) * 10000) % 202;
+            let s = round * 543.21; let r = (Math.sin(s) * 10000) % 202;
             let c = 0; let val = Math.abs(r);
             for (let i = 0; i < items.length; i++) { c += items[i].w; if (val <= c) return i; }
             return 0;
@@ -220,18 +200,13 @@
         });
 
         database.ref('global/history').on('value', s => {
-            if(s.exists()){ 
-                let h=''; 
-                let data = s.val();
-                // নতুন রেজাল্ট সামনে দেখাবে (Reverse order)
-                data.slice(-20).reverse().forEach(x=> h+=`<div class="hist-item">${x}</div>`);
-                document.getElementById('history-bar').innerHTML=h; 
-            }
+            if(s.exists()){ let h=''; let data = s.val(); data.slice(-20).reverse().forEach(x=> h+=`<div class="hist-item">${x}</div>`);
+            document.getElementById('history-bar').innerHTML=h; }
         });
 
         database.ref('players').orderByChild('dailyWin').limitToLast(24).on('value', s => {
             let l=[]; s.forEach(p=>{if(p.val().dailyWin>0)l.push({id:p.key, w:p.val().dailyWin})});
-            l.reverse(); let h=''; l.forEach(u=>h+=`<div class="lb-row"><span>${u.id}</span><span style="color:gold">${u.w.toLocaleString()}</span></div>`);
+            l.sort((a,b)=>b.w-a.w); let h=''; l.forEach(u=>h+=`<div class="lb-row"><span>${u.id}</span><span style="color:gold">${u.w.toLocaleString()}</span></div>`);
             document.getElementById('lb-list').innerHTML=h;
         });
 
@@ -242,17 +217,19 @@
             const div = document.createElement('div'); div.className='slot'; div.id=`slot-${i}`;
             div.style.left=x+'px'; div.style.top=y+'px';
             div.innerHTML=`<div class="hot-label">HOT</div><span>${it.n}</span><b style="font-size:10px;color:gold">${it.m}x</b><div class="bet-txt" id="bv-${i}">0</div>`;
-            div.onclick=()=>{ if(isSpinning||balance<curChip) return; if(bets[i]==0 && bets.filter(b=>b>0).length>=6) return;
-            balance-=curChip; bets[i]+=curChip; document.getElementById(`bv-${i}`).innerText=bets[i].toLocaleString();
-            database.ref('players/'+myUID).update({balance:balance}); database.ref('live_bets/'+i+'/'+myUID).set(bets[i]); };
+            div.onclick=()=>{ 
+                if(isSpinning||balance<curChip) return; 
+                if(bets[i]==0 && bets.filter(b=>b>0).length>=6) return;
+                balance-=curChip; bets[i]+=curChip; document.getElementById(`bv-${i}`).innerText=bets[i].toLocaleString();
+                database.ref('players/'+myUID).update({balance:balance}); 
+                database.ref('live_bets/'+i+'/'+myUID).set(bets[i]); 
+            };
             container.appendChild(div);
         });
 
         function runSpin(r) {
-            isSpinning = true; 
-            document.querySelectorAll('.hot-label').forEach(l => l.style.display = 'none');
+            isSpinning = true; document.querySelectorAll('.hot-label').forEach(l => l.style.display = 'none');
             document.querySelectorAll('.slot').forEach(s => s.classList.remove('hot-border'));
-            
             let idx = getWinner(r); let step = 0;
             let intv = setInterval(() => {
                 document.querySelectorAll('.slot').forEach(s=>s.classList.remove('active-spin'));
@@ -274,16 +251,10 @@
             document.getElementById('pop-winners').innerHTML=h||"No winners";
             document.getElementById('win-popup').style.display='block';
             document.getElementById(`slot-${idx}`).classList.add('win-glow');
-
-            // হিস্টোরি আপডেট (সবার জন্য সিঙ্ক হবে)
             if(myUID.includes("ID1") || Math.random() < 0.1){
                 database.ref('global/history').once('value', s => {
                     let arr = s.exists() ? s.val() : [];
-                    if(arr[arr.length-1] !== items[idx].n){ 
-                        arr.push(items[idx].n); 
-                        if(arr.length>30) arr.shift(); 
-                        database.ref('global/history').set(arr); 
-                    }
+                    if(arr[arr.length-1] !== items[idx].n){ arr.push(items[idx].n); if(arr.length>30) arr.shift(); database.ref('global/history').set(arr); }
                 });
             }
             setTimeout(() => {
@@ -294,14 +265,33 @@
             }, 5000);
         }
 
-        function showTab(id){ document.querySelectorAll('.tab-c').forEach(t=>t.style.display='none'); document.getElementById(id).style.display='block'; }
         function doC2D(){
             let amt = parseInt(document.getElementById('c2d-in').value);
-            if(balance>=amt && amt>=10000){ balance-=amt; wallet+=(amt/10000);
-            database.ref('players/'+myUID).update({balance:balance, wallet:wallet});
-            sendTG(`💰 Break Coins\nExchanged: ${amt.toLocaleString()} Coins\nAdded: $${(amt/10000).toFixed(2)} to Wallet`);
-            alert("Success!"); document.getElementById('c2d-in').value=""; }
+            if(balance>=amt && amt>=10000){ 
+                balance-=amt; wallet+=(amt/10000); database.ref('players/'+myUID).update({balance:balance, wallet:wallet});
+                sendTG(`💰 Break Coins: ${amt.toLocaleString()} -> $${(amt/10000).toFixed(2)}`);
+                alert("Success!"); document.getElementById('c2d-in').value=""; 
+            } else { alert("Min 10,000 Coins!"); }
         }
+
         function doD2C(){
             let amt = parseFloat(document.getElementById('d2c-in').value);
-         
+            if(wallet >= amt && amt > 0){
+                wallet -= amt; balance += (amt * 7000); database.ref('players/'+myUID).update({balance:balance, wallet:wallet});
+                sendTG(`🛒 Buy Coins: $${amt} -> ${(amt*7000).toLocaleString()}`);
+                alert("Success!"); document.getElementById('d2c-in').value="";
+            } else { alert("Insufficient Wallet!"); }
+        }
+
+        function doWithdraw(){
+            let m = document.getElementById('wd-method').value; let n = document.getElementById('wd-num').value;
+            if(wallet >= 30 && n.length >= 10){
+                let a = wallet; wallet = 0; database.ref('players/'+myUID).update({wallet:0});
+                sendTG(`💸 WITHDRAW: ${m} | ${n} | $${a.toFixed(2)}`);
+                alert("Withdraw Request Sent!"); closeModal('exc-modal');
+            } else { alert("Min $30 and valid number required!"); }
+        }
+        syncServer();
+    </script>
+</body>
+</html>
