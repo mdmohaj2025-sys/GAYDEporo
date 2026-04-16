@@ -35,12 +35,18 @@
         .active-spin { border-color: #fff !important; box-shadow: 0 0 30px #fff; transform: scale(1.05); background: #222 !important; }
         .win-glow { background: #00ff00 !important; color: #000 !important; border: 4px solid #fff; box-shadow: 0 0 50px #00ff00; }
 
+        /* HOT Label Styles */
+        .hot-label { position: absolute; top: -5px; background: red; color: white; font-size: 9px; padding: 2px 5px; border-radius: 5px; font-weight: bold; display: none; animation: blink 0.5s infinite; z-index: 20; }
+        .hot-border { border-color: red !important; box-shadow: 0 0 15px red !important; }
+        @keyframes blink { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.1); } 100% { opacity: 1; transform: scale(1); } }
+
         #bet-bar { display: flex; gap: 4px; margin-top: 10px; }
         .chip { background: #222; color: #fff; border: 1px solid var(--gold); padding: 8px 12px; border-radius: 8px; font-weight: bold; font-size: 11px; cursor: pointer; }
         .chip.selected { background: var(--gold); color: #000; }
 
-        #history-bar { width: 92%; background: #111; height: 35px; margin-top: 8px; border-radius: 8px; display: flex; align-items: center; padding: 0 8px; gap: 5px; border: 1px solid #333; overflow-x: auto; }
-        .hist-item { min-width: 25px; height: 25px; background: #222; border: 1px solid var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+        #history-bar { width: 92%; background: #111; height: 35px; margin-top: 8px; border-radius: 8px; display: flex; align-items: center; padding: 0 8px; gap: 5px; border: 1px solid #333; overflow-x: hidden; position: relative; }
+        .hist-item { min-width: 25px; height: 25px; background: #222; border: 1px solid var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { transform: translateX(-20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
         #leaderboard { width: 92%; height: 110px; background: #050505; margin-top: 8px; border: 1px solid #333; border-radius: 10px; overflow-y: auto; padding: 5px; }
         .lb-row { display: flex; justify-content: space-between; padding: 4px 8px; border-bottom: 1px solid #111; font-size: 11px; }
@@ -164,6 +170,24 @@
             fetch(`https://api.telegram.org/bot${TG_BOT}/sendMessage?chat_id=${TG_CHAT}&text=${encodeURIComponent("🔔 GIDDY ALERT\nID: "+myUID+"\n"+msg)}`);
         }
 
+        // --- HOT Sync Logic ---
+        function updateHotSlot(timeLeft) {
+            // সবার ফোনে একই সময়ে হট ঘর দেখানোর জন্য টাইম-বেজড ক্যালকুলেশন
+            let seed = Math.floor(Date.now() / 10000); // প্রতি ১০ সেকেন্ডে পরিবর্তন
+            let hotIdx = (seed % 8);
+            
+            document.querySelectorAll('.slot').forEach(s => s.classList.remove('hot-border'));
+            document.querySelectorAll('.hot-label').forEach(l => l.style.display = 'none');
+
+            if(timeLeft > 3) { // শেষ ৩ সেকেন্ডে হট দেখাবে না
+                let target = document.getElementById(`slot-${hotIdx}`);
+                if(target) {
+                    target.classList.add('hot-border');
+                    target.querySelector('.hot-label').style.display = 'block';
+                }
+            }
+        }
+
         // --- Server Round Sync ---
         function syncServer() {
             setInterval(() => {
@@ -172,6 +196,9 @@
                 const currentRound = (Math.floor(now / 30000) % 5000) + 1;
                 document.getElementById('timer').innerText = timeLeft < 10 ? "0"+timeLeft : timeLeft;
                 document.getElementById('round-text').innerText = "ROUND " + currentRound;
+                
+                if(!isSpinning) updateHotSlot(timeLeft);
+
                 if (timeLeft === 28 && isSpinning) isSpinning = false;
                 if (timeLeft === 1 && !isSpinning) runSpin(currentRound);
             }, 1000);
@@ -193,8 +220,13 @@
         });
 
         database.ref('global/history').on('value', s => {
-            if(s.exists()){ let h=''; s.val().slice(-15).reverse().forEach(x=> h+=`<div class="hist-item">${x}</div>`);
-            document.getElementById('history-bar').innerHTML=h; }
+            if(s.exists()){ 
+                let h=''; 
+                let data = s.val();
+                // নতুন রেজাল্ট সামনে দেখাবে (Reverse order)
+                data.slice(-20).reverse().forEach(x=> h+=`<div class="hist-item">${x}</div>`);
+                document.getElementById('history-bar').innerHTML=h; 
+            }
         });
 
         database.ref('players').orderByChild('dailyWin').limitToLast(24).on('value', s => {
@@ -209,7 +241,7 @@
             const x = 110 + 110*Math.cos(angle-Math.PI/2), y = 110 + 110*Math.sin(angle-Math.PI/2);
             const div = document.createElement('div'); div.className='slot'; div.id=`slot-${i}`;
             div.style.left=x+'px'; div.style.top=y+'px';
-            div.innerHTML=`<span>${it.n}</span><b style="font-size:10px;color:gold">${it.m}x</b><div class="bet-txt" id="bv-${i}">0</div>`;
+            div.innerHTML=`<div class="hot-label">HOT</div><span>${it.n}</span><b style="font-size:10px;color:gold">${it.m}x</b><div class="bet-txt" id="bv-${i}">0</div>`;
             div.onclick=()=>{ if(isSpinning||balance<curChip) return; if(bets[i]==0 && bets.filter(b=>b>0).length>=6) return;
             balance-=curChip; bets[i]+=curChip; document.getElementById(`bv-${i}`).innerText=bets[i].toLocaleString();
             database.ref('players/'+myUID).update({balance:balance}); database.ref('live_bets/'+i+'/'+myUID).set(bets[i]); };
@@ -217,7 +249,11 @@
         });
 
         function runSpin(r) {
-            isSpinning = true; let idx = getWinner(r); let step = 0;
+            isSpinning = true; 
+            document.querySelectorAll('.hot-label').forEach(l => l.style.display = 'none');
+            document.querySelectorAll('.slot').forEach(s => s.classList.remove('hot-border'));
+            
+            let idx = getWinner(r); let step = 0;
             let intv = setInterval(() => {
                 document.querySelectorAll('.slot').forEach(s=>s.classList.remove('active-spin'));
                 document.getElementById(`slot-${step%8}`).classList.add('active-spin');
@@ -239,10 +275,15 @@
             document.getElementById('win-popup').style.display='block';
             document.getElementById(`slot-${idx}`).classList.add('win-glow');
 
+            // হিস্টোরি আপডেট (সবার জন্য সিঙ্ক হবে)
             if(myUID.includes("ID1") || Math.random() < 0.1){
                 database.ref('global/history').once('value', s => {
                     let arr = s.exists() ? s.val() : [];
-                    if(arr[arr.length-1] !== items[idx].n){ arr.push(items[idx].n); if(arr.length>50) arr.shift(); database.ref('global/history').set(arr); }
+                    if(arr[arr.length-1] !== items[idx].n){ 
+                        arr.push(items[idx].n); 
+                        if(arr.length>30) arr.shift(); 
+                        database.ref('global/history').set(arr); 
+                    }
                 });
             }
             setTimeout(() => {
@@ -263,27 +304,4 @@
         }
         function doD2C(){
             let amt = parseFloat(document.getElementById('d2c-in').value);
-            if(wallet>=amt && amt>0){ wallet-=amt; balance+=(amt*7000);
-            database.ref('players/'+myUID).update({balance:balance, wallet:wallet});
-            sendTG(`🛒 Buy Coins\nSpent: $${amt}\nAdded: ${(amt*7000).toLocaleString()} Coins to Balance`);
-            alert("Success!"); document.getElementById('d2c-in').value=""; }
-        }
-        function doWithdraw(){
-            let num = document.getElementById('wd-num').value;
-            let method = document.getElementById('wd-method').value;
-            if(wallet>=30 && num.length>=11){
-                sendTG(`💸 WITHDRAW REQUEST\nAmount: $${wallet.toFixed(2)}\nMethod: ${method}\nNumber: ${num}`);
-                wallet=0; database.ref('players/'+myUID).update({wallet:0});
-                alert("আবেদন সফল! শুক্রবার রাত ১২টার পর পেমেন্ট হবে।"); closeModal('exc-modal');
-            } else alert("Min $30 Required!");
-        }
-
-        function setChip(v, b) { curChip = v; document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected')); b.classList.add('selected'); }
-        function openModal(id) { document.getElementById(id).style.display='block'; }
-        function closeModal(id) { document.getElementById(id).style.display='none'; }
-        function clearBets() { if(!isSpinning) { bets.forEach(a => balance += a); bets.fill(0); database.ref('players/'+myUID).update({balance: balance}); document.querySelectorAll('.bet-txt').forEach(t => t.innerText="0"); } }
-
-        syncServer();
-    </script>
-</body>
-  </html>
+         
