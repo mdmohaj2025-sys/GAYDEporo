@@ -4,10 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <title>BD PRO - GIDDY DELICIOUS</title>
+    <title>BD PRO - GIDDY DELICIOUS (FORM 3)</title>
     <meta property="og:title" content="BD PRO">
     <meta property="og:description" content="লাইভ মাল্টিপ্লেয়ার গেম - এখনই যোগ দিন!">
-    <meta name="description" content="BD PRO - Giddy Delicious Live Game">
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -16,9 +15,15 @@
         :root { --gold: #ffd700; --neon: 0 0 25px rgba(255, 215, 0, 0.9); }
         body { background: #000; color: #fff; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; margin: 0; overflow: hidden; height: 100vh; }
         
-        #header { width: 100%; text-align: center; padding: 10px 0; border-bottom: 2px solid var(--gold); position: relative; background: #111; z-index: 100; }
-        .game-title { font-size: 22px; font-weight: 900; color: var(--gold); text-shadow: var(--neon); margin: 0; }
-        .u-id { position: absolute; left: 10px; top: 12px; background: #fff; color: #111; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
+        #header { width: 100%; text-align: center; padding: 10px 0; border-bottom: 2px solid var(--gold); position: relative; background: #111; z-index: 100; display: flex; align-items: center; justify-content: center; }
+        
+        .profile-section { position: absolute; left: 10px; display: flex; align-items: center; gap: 5px; }
+        .avatar-box { width: 42px; height: 42px; border: 2px solid var(--gold); border-radius: 50%; overflow: hidden; background: #222; position: relative; cursor: pointer; }
+        .avatar-box img { width: 100%; height: 100%; object-fit: cover; }
+        .edit-pfp { position: absolute; bottom: 0; right: 0; background: var(--gold); color: #000; font-size: 10px; padding: 2px; border-radius: 50%; border: 1px solid #000; }
+
+        .game-title { font-size: 20px; font-weight: 900; color: var(--gold); text-shadow: var(--neon); margin: 0; }
+        .u-id { background: #fff; color: #111; padding: 1px 5px; border-radius: 4px; font-size: 9px; font-weight: bold; margin-left: 5px; }
 
         .top-info { width: 92%; display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
         .balance-box { border: 2.5px solid var(--gold); padding: 5px 12px; border-radius: 20px; background: #000; display: flex; align-items: center; gap: 5px; box-shadow: inset 0 0 10px rgba(255, 215, 0, 0.3); font-weight: bold; }
@@ -36,28 +41,39 @@
 
         .hot-label { position: absolute; top: -5px; background: red; color: white; font-size: 9px; padding: 2px 5px; border-radius: 5px; font-weight: bold; display: none; animation: blink 0.5s infinite; z-index: 20; }
         .hot-border { border-color: red !important; box-shadow: 0 0 15px red !important; }
-        @keyframes blink { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.1); } 100% { opacity: 1; transform: scale(1); } }
 
         #bet-bar { display: flex; gap: 4px; margin-top: 10px; flex-wrap: wrap; justify-content: center; }
         .chip { background: #222; color: #fff; border: 1px solid var(--gold); padding: 7px 10px; border-radius: 8px; font-weight: bold; font-size: 11px; cursor: pointer; }
         .chip.selected { background: var(--gold); color: #000; }
 
-        #history-bar { width: 92%; background: #111; height: 35px; margin-top: 8px; border-radius: 8px; display: flex; align-items: center; padding: 0 8px; gap: 5px; border: 1px solid #333; overflow-x: hidden; position: relative; }
-        .hist-item { min-width: 25px; height: 25px; background: #222; border: 1px solid var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; animation: slideIn 0.3s ease-out; }
+        #history-bar { width: 92%; background: #111; height: 35px; margin-top: 8px; border-radius: 8px; display: flex; align-items: center; padding: 0 8px; gap: 5px; border: 1px solid #333; overflow-x: hidden; }
+        .hist-item { min-width: 25px; height: 25px; background: #222; border: 1px solid var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; }
 
         #leaderboard { width: 92%; height: 110px; background: #050505; margin-top: 8px; border: 1px solid #333; border-radius: 10px; overflow-y: auto; padding: 5px; }
-        .lb-row { display: flex; justify-content: space-between; padding: 4px 8px; border-bottom: 1px solid #111; font-size: 11px; }
+        .lb-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 8px; border-bottom: 1px solid #111; font-size: 11px; }
+        .lb-info { display: flex; align-items: center; gap: 8px; }
+        .lb-img { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--gold); object-fit: cover; }
 
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 5000; padding: 20px; box-sizing: border-box; }
         .modal-content { background: #111; border: 2px solid var(--gold); padding: 15px; border-radius: 20px; text-align: center; }
         input, select { width: 90%; padding: 12px; margin: 8px 0; background: #000; color: #ffd700; border: 1px solid #ffd700; border-radius: 10px; font-size: 16px; }
 
-        #win-popup { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #000; border: 4px solid var(--gold); padding: 15px; border-radius: 25px; text-align: center; z-index: 6000; width: 280px; box-shadow: 0 0 100px rgba(255, 215, 0, 0.4); }
+        #crop-frame { width: 220px; height: 220px; margin: 15px auto; border: 2px dashed var(--gold); position: relative; overflow: hidden; background: #000; border-radius: 50%; }
+        #crop-target-img { position: absolute; top: 0; left: 0; cursor: move; touch-action: none; transform-origin: top left; }
+
+        #win-popup { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #000; border: 4px solid var(--gold); padding: 15px; border-radius: 25px; text-align: center; z-index: 6000; width: 290px; box-shadow: 0 0 100px rgba(255, 215, 0, 0.4); }
+        .win-pfp { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--gold); object-fit: cover; }
     </style>
 </head>
 <body>
     <div id="header">
-        <div class="u-id" id="my-id">ID: ...</div>
+        <div class="profile-section">
+            <div class="avatar-box" onclick="openModal('pfp-modal')">
+                <img id="my-pfp" src="https://cdn-icons-png.flaticon.com/512/149/149071.png">
+                <div class="edit-pfp">📸</div>
+            </div>
+            <div class="u-id" id="my-id">ID: ...</div>
+        </div>
         <h1 class="game-title">GIDDY DELICIOUS</h1>
     </div>
     <div class="top-info">
@@ -82,51 +98,46 @@
     </div>
     <div id="history-bar"></div>
     <div id="leaderboard">
-        <div style="font-size:10px; color:gold; text-align:center; margin-bottom:5px;">TOP 24 DAILY WINNERS</div>
+        <div style="font-size:10px; color:gold; text-align:center; margin-bottom:5px;">DAILY WINNERS (TODAY)</div>
         <div id="lb-list"></div>
-    </div><div id="rec-modal" class="modal">
+    </div>
+    <div id="pfp-modal" class="modal">
+        <div class="modal-content">
+            <h3 style="color:gold;">ছবি কাটিং করুন</h3>
+            <input type="file" id="pfp-input" accept="image/*" style="display:none;" onchange="handleImageSelect(event)">
+            <label for="pfp-input" style="background:var(--gold); color:#000; padding:10px 20px; border-radius:10px; cursor:pointer; font-weight:bold;">🖼️ গ্যালারি থেকে ছবি নিন</label>
+            <div id="crop-frame"><img id="crop-target-img" src=""></div>
+            <p style="font-size:11px; color:#aaa;">ছবিটি রিংয়ের ভেতর ড্র্যাগ করে পজিশন করুন</p>
+            <div style="margin-top:15px;">
+                <button onclick="applyImageCrop()" style="background:lime; color:#000; border:none; padding:12px 25px; border-radius:10px; font-weight:bold;">CONFIRM</button>
+                <button onclick="closeModal('pfp-modal')" style="background:red; color:#fff; border:none; padding:12px 25px; border-radius:10px; font-weight:bold; margin-left:10px;">BACK</button>
+            </div>
+        </div>
+    </div>
+    <div id="rec-modal" class="modal">
         <div class="modal-content">
             <h3 style="color:gold;">রিচার্জ অপশন</h3>
-            <p style="font-size:14px; color:#fff;">রিচার্জের জন্য আপনার আইডি কপি করে এডমিনকে দিন।</p>
-            <div style="background:#222; padding:10px; border-radius:10px; border:1px dashed gold; margin:10px 0;">
-                <b id="copy-target" style="font-size:18px; color:gold;">Loading...</b><br>
-                <button onclick="copyID()" style="margin-top:5px; padding:5px 10px; cursor:pointer; font-weight:bold;">ID কপি করুন</button>
-            </div>
-            <div style="background:#333; padding:12px; border-radius:10px; margin-bottom:15px;">
-                <span style="color:gold; font-size:13px; font-weight:bold;">এডমিন নম্বর (WhatsApp & IMO):</span><br>
-                <b style="font-size:18px; color:#fff;">+880 1964-804813</b>
-            </div>
-            <button onclick="window.open('https://s.imoim.net/ehG1vF', '_blank')" style="background:#25D366; color:white; width:100%; padding:12px; border:none; border-radius:10px; font-weight:bold; font-size:16px;">IMO এডমিন কন্টাক্ট</button>
-            <br><br>
-            <button onclick="closeModal('rec-modal')" style="background:red; color:white; border:none; padding:10px 20px; border-radius:5px;">BACK</button>
+            <div style="background:#222; padding:10px; border-radius:10px; border:1px dashed gold; margin:10px 0;"><b id="copy-target" style="font-size:18px; color:gold;">Loading...</b><br><button onclick="copyID()" style="margin-top:5px; padding:5px 10px; cursor:pointer; font-weight:bold;">ID কপি করুন</button></div>
+            <div style="background:#333; padding:12px; border-radius:10px; margin-bottom:15px;"><span style="color:gold; font-size:13px; font-weight:bold;">এডমিন নম্বর (IMO):</span><br><b style="font-size:18px; color:#fff;">+880 1964-804813</b></div>
+            <button onclick="window.open('https://s.imoim.net/ehG1vF', '_blank')" style="background:#25D366; color:white; width:100%; padding:12px; border:none; border-radius:10px; font-weight:bold;">IMO এডমিন কন্টাক্ট</button>
+            <br><br><button onclick="closeModal('rec-modal')" style="background:red; color:white; border:none; padding:10px 20px; border-radius:5px;">BACK</button>
         </div>
     </div>
-
-    <div id="win-popup">
-        <h2 id="pop-res-icon" style="font-size:50px; margin:0;"></h2>
-        <div id="pop-winners" style="background:#111; padding:10px; border-radius:10px; font-size:12px; text-align:left; margin:10px 0;"></div>
-        <div style="display:flex; justify-content:space-between; font-size:14px;">
-            <span>Bet: <b id="pop-my-bet">0</b></span>
-            <span>Win: <b id="pop-my-win" style="color:lime">0</b></span>
-        </div>
-    </div>
-
     <div id="exc-modal" class="modal">
         <div class="modal-content">
             <h2 id="wallet-val" style="color:lime; margin-bottom:5px;">$0.00</h2>
-            <div style="display:flex; gap:5px; margin-bottom:10px;">
-                <button onclick="showTab('tab1')" style="flex:1; padding:8px; border-radius:5px;">Break Coin</button>
-                <button onclick="showTab('tab2')" style="flex:1; padding:8px; border-radius:5px;">Buy Coin</button>
-                <button onclick="showTab('tab3')" style="flex:1; padding:8px; border-radius:5px;">Withdraw</button>
-            </div>
+            <div style="display:flex; gap:5px; margin-bottom:10px;"><button onclick="showTab('tab1')" style="flex:1; padding:8px;">Break Coin</button><button onclick="showTab('tab2')" style="flex:1; padding:8px;">Buy Coin</button><button onclick="showTab('tab3')" style="flex:1; padding:8px;">Withdraw</button></div>
             <div id="tab1" class="tab-c"><input type="number" id="c2d-in" placeholder="কয়েন দিন" oninput="document.getElementById('c2h').innerText='পাবেন: $'+(this.value/10000).toFixed(2)"><p id="c2h" style="color:#0f0; font-size:12px;">পাবেন: $0.00</p><button onclick="doC2D()" style="background:gold; width:90%; padding:12px; border:none; border-radius:10px; font-weight:bold; color:black;">Confirm Exchange</button></div>
             <div id="tab2" class="tab-c" style="display:none;"><input type="number" id="d2c-in" placeholder="ডলার দিন" oninput="document.getElementById('d2h').innerText='পাবেন: '+(this.value*7000).toLocaleString()+' Coins'"><p id="d2h" style="color:#0f0; font-size:12px;">পাবেন: 0 Coins</p><button onclick="doD2C()" style="background:cyan; width:90%; padding:12px; border:none; border-radius:10px; font-weight:bold; color:black;">Confirm Purchase</button></div>
             <div id="tab3" class="tab-c" style="display:none;"><p style="font-size:11px; color:#aaa;">Min $30 req.</p><select id="wd-method"><option value="Bkash">Bkash</option><option value="Nagad">Nagad</option></select><input type="text" id="wd-num" placeholder="নম্বর দিন"><button onclick="doWithdraw()" style="background:lime; width:90%; padding:12px; border:none; border-radius:10px; font-weight:bold; color:black;">Confirm Withdraw</button></div>
             <br><button onclick="closeModal('exc-modal')" style="background:red; color:white; border:none; padding:10px 20px; border-radius:5px;">BACK</button>
         </div>
     </div>
-
-    <script>
+    <div id="win-popup">
+        <h2 id="pop-res-icon" style="font-size:45px; margin:0;"></h2>
+        <div id="pop-winners" style="background:#111; padding:8px; border-radius:15px; font-size:11px; text-align:left; margin:10px 0;"></div>
+        <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:bold;"><span>Bet: <span id="pop-my-bet">0</span></span><span>Win: <span id="pop-my-win" style="color:lime">0</span></span></div>
+    </div><script>
         var firebaseConfig = {
             apiKey: "AIzaSyAuTV33AGDrEDnkXe6GiwhA2_HEQMY8U0E",
             authDomain: "gadedporo.firebaseapp.com",
@@ -139,159 +150,149 @@
         firebase.initializeApp(firebaseConfig);
         var database = firebase.database();
 
-        const TG_BOT = "8690149395:AAEy-hIHok42Z3EWZ41ivH1AigqGB-D96lU", TG_CHAT = "7767594784";
-        const items = [{n:'🍅',m:5,w:40},{n:'🍆',m:5,w:40},{n:'🥬',m:5,w:40},{n:'🥕',m:5,w:40},{n:'🍔',m:10,w:20},{n:'🍢',m:15,w:15},{n:'🍗',m:25,w:5},{n:'🥩',m:45,w:2}];
-
         let myUID = localStorage.getItem('giddy_uid') || "ID"+Math.floor(10000000+Math.random()*90000000);
         localStorage.setItem('giddy_uid', myUID);
         document.getElementById('my-id').innerText = myUID;
         document.getElementById('copy-target').innerText = myUID;
 
-        let balance = 0, wallet = 0, dailyWin = 0, isSpinning = false, curChip = 5000, bets = Array(8).fill(0);
+        let balance = 0, wallet = 0, isSpinning = false, curChip = 5000, bets = Array(8).fill(0);
+        const items = [{n:'🍅',m:5,w:40},{n:'🍆',m:5,w:40},{n:'🥬',m:5,w:40},{n:'🥕',m:5,w:40},{n:'🍔',m:10,w:20},{n:'🍢',m:15,w:15},{n:'🍗',m:25,w:5},{n:'🥩',m:45,w:2}];
+
+        let curX = 0, curY = 0, dragX, dragY;
+        const cropImg = document.getElementById('crop-target-img');
+        
+        function handleImageSelect(e) {
+            const reader = new FileReader();
+            reader.onload = (f) => { cropImg.src = f.target.result; curX=0; curY=0; cropImg.style.transform=`translate(0px, 0px)`; };
+            reader.readAsDataURL(e.target.files[0]);
+        }
+        cropImg.addEventListener('touchstart', e => { dragX = e.touches[0].clientX - curX; dragY = e.touches[0].clientY - curY; });
+        cropImg.addEventListener('touchmove', e => { e.preventDefault(); curX = e.touches[0].clientX - dragX; curY = e.touches[0].clientY - dragY; cropImg.style.transform = `translate(${curX}px, ${curY}px)`; });
+
+        function applyImageCrop() {
+            if(!cropImg.src) return;
+            const canvas = document.createElement('canvas'); canvas.width = 150; canvas.height = 150;
+            const ctx = canvas.getContext('2d'); const ratio = cropImg.naturalWidth / cropImg.clientWidth;
+            ctx.drawImage(cropImg, -curX * ratio, -curY * ratio, 220 * ratio, 220 * ratio, 0, 0, 150, 150);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+            database.ref('players/'+myUID).update({pfp: dataUrl});
+            document.getElementById('my-pfp').src = dataUrl;
+            closeModal('pfp-modal');
+        }
 
         function openModal(id) { document.getElementById(id).style.display = 'block'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function copyID() { navigator.clipboard.writeText(myUID); alert("ID Copied!"); }
-        function setChip(amt, el) { curChip = amt; document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected')); el.classList.add('selected'); }
         function showTab(id){ document.querySelectorAll('.tab-c').forEach(t=>t.style.display='none'); document.getElementById(id).style.display='block'; }
-        function clearBets() { if(!isSpinning) alert("Contact admin to reset bets."); }
-
-        function syncServer() {
-            setInterval(() => {
-                const now = Date.now();
-                const timeLeft = 30 - (Math.floor(now / 1000) % 30);
-                const currentRound = (Math.floor(now / 30000) % 5000) + 1;
-                document.getElementById('timer').innerText = timeLeft < 10 ? "0"+timeLeft : timeLeft;
-                document.getElementById('round-text').innerText = "ROUND " + currentRound;
-                if(!isSpinning) {
-                    let seed = Math.floor(Date.now() / 10000);
-                    let hotIdx = (seed % 8);
-                    document.querySelectorAll('.slot').forEach(s => s.classList.remove('hot-border'));
-                    document.querySelectorAll('.hot-label').forEach(l => l.style.display = 'none');
-                    if(timeLeft > 3) {
-                        let target = document.getElementById(`slot-${hotIdx}`);
-                        if(target) { target.classList.add('hot-border'); target.querySelector('.hot-label').style.display = 'block'; }
-                    }
-                }
-                if (timeLeft === 28 && isSpinning) isSpinning = false;
-                if (timeLeft === 1 && !isSpinning) runSpin(currentRound);
-            }, 1000);
-        }
+        function setChip(amt, el) { curChip = amt; document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected')); el.classList.add('selected'); }
+        function copyID() { navigator.clipboard.writeText(myUID); alert("ID Copied!"); }
 
         database.ref('players/'+myUID).on('value', s => {
-            if(s.exists()){ balance=s.val().balance; wallet=s.val().wallet||0; dailyWin=s.val().dailyWin||0;
-            document.getElementById('balance').innerText=balance.toLocaleString();
-            document.getElementById('wallet-val').innerText=`$${wallet.toFixed(2)}`; }
-            else { database.ref('players/'+myUID).set({balance:20000, wallet:0, dailyWin:0}); }
+            if(s.exists()){ 
+                let d = s.val(); balance=d.balance; wallet=d.wallet||0;
+                document.getElementById('balance').innerText=balance.toLocaleString();
+                document.getElementById('wallet-val').innerText=`$${wallet.toFixed(2)}`;
+                if(d.pfp) document.getElementById('my-pfp').src = d.pfp;
+            } else { database.ref('players/'+myUID).set({balance:20000, wallet:0, pfp:""}); }
         });
 
         database.ref('global/history').on('value', s => {
-            if(s.exists()){ let h=''; let data = s.val(); data.slice(-20).reverse().forEach(x=> h+=`<div class="hist-item">${x}</div>`);
-            document.getElementById('history-bar').innerHTML=h; }
+            if(s.exists()){ let h=''; s.val().slice(-20).reverse().forEach(x=> h+=`<div class="hist-item">${x}</div>`); document.getElementById('history-bar').innerHTML=h; }
         });
 
-        database.ref('players').orderByChild('dailyWin').limitToLast(24).on('value', s => {
-            let l=[]; s.forEach(p=>{if(p.val().dailyWin>0)l.push({id:p.key, w:p.val().dailyWin})});
-            l.sort((a,b)=>b.w-a.w); let h=''; l.forEach(u=>h+=`<div class="lb-row"><span>${u.id}</span><span style="color:gold">${u.w.toLocaleString()}</span></div>`);
+        function getTodayKey() { return new Date().toISOString().slice(0, 10); }
+        database.ref('daily_leaderboard/'+getTodayKey()).orderByChild('w').limitToLast(24).on('value', s => {
+            let l=[]; s.forEach(p=>{if(p.val().w>0)l.push(p.val())});
+            l.sort((a,b)=>b.w-a.w); let h='';
+            l.forEach(u=> h+=`<div class="lb-row"><div class="lb-info"><img class="lb-img" src="${u.pfp||'https://cdn-icons-png.flaticon.com/512/149/149071.png'}"><span>${u.id}</span></div><span style="color:gold">${u.w.toLocaleString()}</span></div>`);
             document.getElementById('lb-list').innerHTML=h;
         });
 
         const container = document.getElementById('slots-container');
         items.forEach((it, i) => {
             const angle = (i/8)*Math.PI*2;
-            const x = 110 + 110*Math.cos(angle-Math.PI/2), y = 110 + 110*Math.sin(angle-Math.PI/2);
             const div = document.createElement('div'); div.className='slot'; div.id=`slot-${i}`;
-            div.style.left=x+'px'; div.style.top=y+'px';
+            div.style.left=(110+110*Math.cos(angle-Math.PI/2))+'px'; div.style.top=(110+110*Math.sin(angle-Math.PI/2))+'px';
             div.innerHTML=`<div class="hot-label">HOT</div><span>${it.n}</span><b style="font-size:10px;color:gold">${it.m}x</b><div class="bet-txt" id="bv-${i}">0</div>`;
             div.onclick=()=>{ 
-                if(isSpinning||balance<curChip) return; 
-                let activeCount = bets.filter(b => b > 0).length;
-                if(activeCount >= 6 && bets[i] == 0) { alert("Maximum 6 slots allowed!"); return; }
+                if(isSpinning||balance<curChip) return;
+                if(bets.filter(b => b > 0).length >= 6 && bets[i] == 0) { alert("Max 6 slots!"); return; }
                 balance-=curChip; bets[i]+=curChip; document.getElementById(`bv-${i}`).innerText=bets[i].toLocaleString();
-                database.ref('players/'+myUID).update({balance:balance}); 
-                database.ref('live_bets/'+i+'/'+myUID).set(bets[i]); 
+                database.ref('players/'+myUID).update({balance}); database.ref('live_bets/'+i+'/'+myUID).set(bets[i]); 
             };
             container.appendChild(div);
         });
 
+        function syncServer() {
+            setInterval(() => {
+                const now = Date.now(); const timeLeft = 30 - (Math.floor(now / 1000) % 30);
+                document.getElementById('timer').innerText = timeLeft < 10 ? "0"+timeLeft : timeLeft;
+                document.getElementById('round-text').innerText = "ROUND " + (Math.floor(now/30000)%5000+1);
+                if(!isSpinning){
+                    let hotIdx = (Math.floor(now / 10000) % 8);
+                    document.querySelectorAll('.slot').forEach(s => s.classList.remove('hot-border'));
+                    document.querySelectorAll('.hot-label').forEach(l => l.style.display = 'none');
+                    if(timeLeft > 3) { let t = document.getElementById(`slot-${hotIdx}`); t.classList.add('hot-border'); t.querySelector('.hot-label').style.display = 'block'; }
+                }
+                if (timeLeft === 1 && !isSpinning) runSpin(Math.floor(now/30000));
+            }, 1000);
+        }
+
         function runSpin(r) {
-            isSpinning = true; document.querySelectorAll('.hot-label').forEach(l => l.style.display = 'none');
-            document.querySelectorAll('.slot').forEach(s => s.classList.remove('hot-border'));
+            isSpinning = true;
             let idx = (function(round) {
-                let s = round * 543.21; let r = (Math.sin(s) * 10000) % 202;
-                let c = 0; let val = Math.abs(r);
-                for (let i = 0; i < items.length; i++) { c += items[i].w; if (val <= c) return i; }
+                let s = round * 543.21; let val = Math.abs((Math.sin(s) * 10000) % 202);
+                let c = 0; for (let i = 0; i < items.length; i++) { c += items[i].w; if (val <= c) return i; }
                 return 0;
             })(r);
             let step = 0;
             let intv = setInterval(() => {
                 document.querySelectorAll('.slot').forEach(s=>s.classList.remove('active-spin'));
                 document.getElementById(`slot-${step%8}`).classList.add('active-spin');
-                if(step++ >= 30+idx){ clearInterval(intv); endRound(idx, r); }
+                if(step++ >= 30+idx){ clearInterval(intv); endRound(idx); }
             }, 80);
         }
 
-        async function endRound(idx, r) {
-            let win = bets[idx]*items[idx].m; dailyWin+=win; balance+=win;
-            database.ref('players/'+myUID).update({balance:balance, dailyWin:dailyWin});
+        async function endRound(idx) {
+            let win = bets[idx]*items[idx].m; let today = getTodayKey();
+            database.ref('players/'+myUID).update({balance: balance + win});
+            if(win > 0) {
+                database.ref('daily_leaderboard/'+today+'/'+myUID).once('value', s => {
+                    let oldW = s.exists() ? s.val().w : 0;
+                    database.ref('daily_leaderboard/'+today+'/'+myUID).set({id:myUID, w:oldW+win, pfp: document.getElementById('my-pfp').src});
+                });
+            }
             document.getElementById('pop-res-icon').innerText=items[idx].n;
             document.getElementById('pop-my-bet').innerText=bets[idx].toLocaleString();
             document.getElementById('pop-my-win').innerText=win.toLocaleString();
-            const snap = await database.ref('live_bets/'+idx).once('value');
-            let winners = [];
-            snap.forEach(u => winners.push({id:u.key, a:u.val()*items[idx].m}));
-            winners.sort((a,b)=>b.a-a.a);
-            let h = '<b style="color:gold; font-size:13px;">ROUND RANKING:</b><br>';
+            const snap = await database.ref('live_bets/'+idx).once('value'); let winners = [];
+            if(snap.exists()){
+                const pSnap = await database.ref('players').once('value');
+                snap.forEach(u => { let d = pSnap.child(u.key).val(); winners.push({id:u.key, a:u.val()*items[idx].m, pfp: d?d.pfp:""}); });
+            }
+            winners.sort((a,b)=>b.a-a.a); let h = '';
             winners.slice(0,3).forEach((w,i)=> {
-                let label = i === 0 ? "TOP 1" : i === 1 ? "TOP 2" : "TOP 3";
-                h+=`<div style="display:flex; justify-content:space-between; margin-top:3px; border-bottom:1px solid #222;">
-                    <span><b style="color:gold;">${label}:</b> ${w.id}</span> 
-                    <span style="color:lime">+${w.a.toLocaleString()}</span>
+                let rank = i===0?"🥇":i===1?"🥈":"🥉";
+                h+=`<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:5px; border-bottom:1px solid #222; padding-bottom:3px;">
+                    <div style="display:flex; align-items:center; gap:8px;"><span>${rank}</span><img src="${w.pfp||'https://cdn-icons-png.flaticon.com/512/149/149071.png'}" class="win-pfp"><span>${w.id}</span></div><b style="color:lime">+${w.a.toLocaleString()}</b>
                 </div>`;
             });
-            if(winners.length === 0) h += "No winners this round";
-            document.getElementById('pop-winners').innerHTML=h;
+            document.getElementById('pop-winners').innerHTML=h || "<center>No winners</center>";
             document.getElementById('win-popup').style.display='block';
             document.getElementById(`slot-${idx}`).classList.add('win-glow');
             database.ref('global/history').once('value', s => {
-                let arr = s.exists() ? s.val() : [];
-                if(arr.length === 0 || arr[arr.length-1] !== items[idx].n){ 
-                    arr.push(items[idx].n); if(arr.length>30) arr.shift(); database.ref('global/history').set(arr); 
-                }
+                let arr = s.exists() ? s.val() : []; arr.push(items[idx].n); if(arr.length>30) arr.shift(); database.ref('global/history').set(arr);
             });
             setTimeout(() => {
-                document.getElementById('win-popup').style.display='none';
+                isSpinning = false; document.getElementById('win-popup').style.display='none';
                 document.querySelectorAll('.slot').forEach(s=>s.classList.remove('win-glow','active-spin'));
                 document.querySelectorAll('.bet-txt').forEach(t=>t.innerText="0");
                 bets.fill(0); if(myUID.includes("ID1")) database.ref('live_bets').remove(); 
-            }, 5000);
+            }, 6000);
         }
 
-        function sendTG(msg) { fetch(`https://api.telegram.org/bot${TG_BOT}/sendMessage?chat_id=${TG_CHAT}&text=${encodeURIComponent("🔔 GIDDY ALERT\nID: "+myUID+"\n"+msg)}`); }
-        function doC2D(){
-            let amt = parseInt(document.getElementById('c2d-in').value);
-            if(balance>=amt && amt>=10000){ 
-                balance-=amt; wallet+=(amt/10000); database.ref('players/'+myUID).update({balance:balance, wallet:wallet});
-                sendTG(`💰 Break Coins: ${amt.toLocaleString()} -> $${(amt/10000).toFixed(2)}`);
-                alert("Success!"); document.getElementById('c2d-in').value=""; 
-            } else { alert("Min 10,000 Coins!"); }
-        }
-        function doD2C(){
-            let amt = parseFloat(document.getElementById('d2c-in').value);
-            if(wallet >= amt && amt > 0){
-                wallet -= amt; balance += (amt * 7000); database.ref('players/'+myUID).update({balance:balance, wallet:wallet});
-                sendTG(`🛒 Buy Coins: $${amt} -> ${(amt*7000).toLocaleString()}`);
-                alert("Success!"); document.getElementById('d2c-in').value="";
-            } else { alert("Insufficient Wallet!"); }
-        }
-        function doWithdraw(){
-            let n = document.getElementById('wd-num').value;
-            if(wallet >= 30 && n.length >= 10){
-                let val = wallet; wallet = 0; database.ref('players/'+myUID).update({wallet:0});
-                sendTG(`💸 WITHDRAW: $${val.toFixed(2)} to ${n}`);
-                alert("Withdraw Request Sent!"); closeModal('exc-modal');
-            } else { alert("Min $30 and valid number required!"); }
-        }
+        function doC2D(){ let amt = parseInt(document.getElementById('c2d-in').value); if(balance>=amt && amt>=10000){ balance-=amt; wallet+=(amt/10000); database.ref('players/'+myUID).update({balance, wallet}); alert("Success!"); } else alert("Min 10,000 Coins!"); }
+        function doD2C(){ let amt = parseFloat(document.getElementById('d2c-in').value); if(wallet>=amt && amt>0){ wallet-=amt; balance+=(amt*7000); database.ref('players/'+myUID).update({balance, wallet}); alert("Success!"); } else alert("Insufficient Wallet!"); }
+        function doWithdraw(){ let n = document.getElementById('wd-num').value; if(wallet>=30 && n.length>=10){ wallet=0; database.ref('players/'+myUID).update({wallet:0}); alert("Withdraw Request Sent!"); closeModal('exc-modal'); } else alert("Min $30 and valid number!"); }
         syncServer();
     </script>
 </body>
