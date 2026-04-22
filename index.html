@@ -8,14 +8,13 @@
     <meta property="og:description" content="লাইভ মাল্টিপ্লেয়ার গেম - এখনই যোগ দিন!">
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <style>
-        :root { --gold: #ffd700; --neon: 0 0 25px rgba(255, 215, 0, 0.9); }
+    <style>        :root { --gold: #ffd700; --neon: 0 0 25px rgba(255, 215, 0, 0.9); }
         body { background: #000; color: #fff; font-family: sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
         .game-container { width: 100%; min-height: 100vh; transition: all 0.3s ease; }
         .game-1 { display: block; }
         .game-2 { display: none; }
         
-        /* সুইচ বাটন - গোল্ড রিং, ৭৭ লেখা, লাফানো */
+        /* সুইচ বাটন */
         .switch-game-btn {
             position: fixed; top: 15px; right: 15px; z-index: 9999;
             width: 55px; height: 55px; border-radius: 50%;
@@ -39,7 +38,7 @@
             100% { box-shadow: 0 0 0 0 rgba(255,215,0,0); }
         }
         
-        /* গেম ১ এর স্টাইল (অপরিবর্তিত) */
+        /* গেম ১ স্টাইল */
         .game-1 .header { width: 100%; text-align: center; padding: 10px 0; border-bottom: 2px solid var(--gold); position: relative; background: #111; display: flex; align-items: center; justify-content: center; }
         .game-1 .profile-section { position: absolute; left: 10px; display: flex; align-items: center; gap: 5px; }
         .game-1 .avatar-box { width: 42px; height: 42px; border: 2px solid var(--gold); border-radius: 50%; overflow: hidden; background: #222; cursor: pointer; }
@@ -76,7 +75,7 @@
         .game-1 #win-popup { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #000; border: 4px solid var(--gold); padding: 15px; border-radius: 25px; text-align: center; z-index: 6000; width: 290px; box-shadow: 0 0 100px rgba(255, 215, 0, 0.4); }
         .game-1 .win-pfp { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--gold); object-fit: cover; }
 
-        /* গেম ২ এর স্টাইল - সাইজ একটু ছোট, লিডারবোর্ড সহজে দেখা যাবে */
+        /* গেম ২ স্টাইল */
         .game-2 { background: #05000a; font-family: 'Segoe UI', sans-serif; padding-bottom: 10px; }
         .game-2 .top-bar { width: 100%; padding: 8px 12px; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; }
         .game-2 .profile-section { display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.7); padding: 4px 10px; border-radius: 50px; border: 1px solid var(--gold); }
@@ -104,7 +103,7 @@
         .game-2 .bet-card { background: #150025; border: 2px solid #333; border-radius: 12px; padding: 8px; text-align: center; flex: 1; transition: 0.3s; cursor: pointer; }
         .game-2 .bet-card.active { border-color: #ffd700; background: #250045; box-shadow: 0 0 15px #ffd700; }
         .game-2 .bet-amt { font-size: 16px; font-weight: bold; margin-top: 3px; color: #fff; }
-        .game-2 .chip-area { display: flex; gap: 12px; margin-top: 5px; }
+        .game-2 .chip-area { display: flex; gap: 12px; margin-top: 5px; flex-wrap: wrap; justify-content: center; }
         .game-2 .chip { width: 55px; height: 55px; background: radial-gradient(circle, #fff, #ffd700, #b8860b); border-radius: 50%; color: #000; font-weight: 900; display: flex; align-items: center; justify-content: center; border: 3px solid #000; cursor: pointer; font-size: 14px; }
         .game-2 .chip.selected { border: 4px solid #fff; transform: scale(1.05); }
         .game-2 #popup { display: none; position: fixed; top: 45%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.98); border: 3px solid #ffd700; padding: 20px; z-index: 1000; border-radius: 25px; text-align: center; min-width: 280px; box-shadow: 0 0 60px rgba(255,215,0,0.6); }
@@ -118,8 +117,7 @@
         .game-2 #crop-target-img2 { position: absolute; top: 0; left: 0; cursor: move; touch-action: none; transform-origin: top left; width: 100%; }
     </style>
 </head>
-<body>
-<!-- গেম ১ -->
+<body><!-- গেম ১ -->
 <div id="game1Container" class="game-container game-1">
     <button class="switch-game-btn" id="toggleGameBtn">77</button>
     <div class="header">
@@ -147,9 +145,7 @@
     <div id="rec-modal" class="modal"><div class="modal-content"><h3 style="color:gold;">রিচার্জ অপশন</h3><div style="background:#222; padding:10px; border-radius:10px; border:1px dashed gold; margin:10px 0;"><b id="copy-target" style="font-size:18px; color:gold;">Loading...</b><br><button onclick="copyID()" style="margin-top:5px; padding:5px 10px; cursor:pointer; font-weight:bold;">ID কপি করুন</button></div><div style="background:#333; padding:12px; border-radius:10px; margin-bottom:15px;"><span style="color:gold; font-size:13px; font-weight:bold;">এডমিন নম্বর (IMO):</span><br><b style="font-size:18px; color:#fff;">+880 1964-804813</b></div><button onclick="window.open('https://s.imoim.net/ehG1vF', '_blank')" style="background:#25D366; color:white; width:100%; padding:12px; border:none; border-radius:10px; font-weight:bold;">IMO এডমিন কন্টাক্ট</button><br><br><button onclick="closeModal('rec-modal')" style="background:red; color:white; border:none; padding:10px 20px; border-radius:5px;">BACK</button></div></div>
     <div id="exc-modal" class="modal"><div class="modal-content"><h2 id="wallet-val" style="color:lime;">$0.00</h2><div style="display:flex; gap:5px; margin-bottom:10px;"><button onclick="showTab('tab1')" style="flex:1; padding:8px;">Break Coin</button><button onclick="showTab('tab2')" style="flex:1; padding:8px;">Buy Coin</button><button onclick="showTab('tab3')" style="flex:1; padding:8px;">Withdraw</button></div><div id="tab1" class="tab-c"><input type="number" id="c2d-in" placeholder="কয়েন দিন" oninput="document.getElementById('c2h').innerText='পাবেন: $'+(this.value/10000).toFixed(2)"><p id="c2h" style="color:#0f0; font-size:12px;">পাবেন: $0.00</p><button onclick="doC2D()" style="background:gold; width:90%; padding:12px; border:none; border-radius:10px; font-weight:bold; color:black;">Confirm Exchange</button></div><div id="tab2" class="tab-c" style="display:none;"><input type="number" id="d2c-in" placeholder="ডলার দিন" oninput="document.getElementById('d2h').innerText='পাবেন: '+(this.value*7000).toLocaleString()+' Coins'"><p id="d2h" style="color:#0f0; font-size:12px;">পাবেন: 0 Coins</p><button onclick="doD2C()" style="background:cyan; width:90%; padding:12px; border:none; border-radius:10px; font-weight:bold; color:black;">Confirm Purchase</button></div><div id="tab3" class="tab-c" style="display:none;"><p style="font-size:11px; color:#aaa;">Min $30 req.</p><select id="wd-method"><option value="Bkash">Bkash</option><option value="Nagad">Nagad</option></select><input type="text" id="wd-num" placeholder="নম্বর দিন"><button onclick="doWithdraw()" style="background:lime; width:90%; padding:12px; border:none; border-radius:10px; font-weight:bold; color:black;">Confirm Withdraw</button></div><br><button onclick="closeModal('exc-modal')" style="background:red; color:white; border:none; padding:10px 20px; border-radius:5px;">BACK</button></div></div>
     <div id="win-popup"><h2 id="pop-res-icon" style="font-size:45px; margin:0;"></h2><div id="pop-winners" style="background:#111; padding:8px; border-radius:15px; font-size:11px; text-align:left; margin:10px 0;"></div><div style="display:flex; justify-content:space-between; font-size:13px; font-weight:bold;"><span>Bet: <span id="pop-my-bet">0</span></span><span>Win: <span id="pop-my-win" style="color:lime">0</span></span></div></div>
-</div>
-
-<!-- গেম ২ (চাকা ঘুরানোর পর পপআপ দেরিতে আসবে, সাইজ ছোট) -->
+</div><!-- গেম ২ -->
 <div id="game2Container" class="game-container game-2">
     <div class="top-bar">
         <div class="profile-section">
@@ -177,14 +173,13 @@
             <div class="chip" onclick="selectChip2(1000, this)">1K</div>
             <div class="chip" onclick="selectChip2(10000, this)">10K</div>
             <div class="chip" onclick="selectChip2(100000, this)">100K</div>
+            <div class="chip" onclick="selectChip2(500000, this)">500K</div>
         </div>
-                                                                                    </div>
+    </div>
     <div id="leaderboard2"><div style="font-size:10px; color:gold; text-align:center; margin-bottom:5px;">🎰 GAME 2 WINNERS TODAY</div><div id="lb-list2"></div></div>
     <div id="popup"></div>
     <div id="pfp-modal2" class="crop-modal2"><div class="modal-content2"><h3 style="color:gold;">প্রোফাইল ছবি কাটিং</h3><input type="file" id="pfp-input2" accept="image/*" style="display:none;" onchange="handleImageSelect2(event)"><label for="pfp-input2" style="background:var(--gold); color:#000; padding:10px 20px; border-radius:10px; cursor:pointer; font-weight:bold;">🖼️ গ্যালারি থেকে ছবি নিন</label><div id="crop-frame2"><img id="crop-target-img2" src=""></div><p style="font-size:11px; color:#aaa;">ছবি ড্র্যাগ করে পজিশন করুন</p><div><button onclick="applyImageCrop2()" style="background:lime; color:#000; border:none; padding:12px 25px; border-radius:10px; font-weight:bold;">CONFIRM</button><button onclick="closeModal2()" style="background:red; color:#fff; border:none; padding:12px 25px; border-radius:10px; margin-left:10px;">BACK</button></div></div></div>
-</div>
-
-<script>
+</div><script>
     // Firebase config
     const firebaseConfig = { apiKey: "AIzaSyAuTV33AGDrEDnkXe6GiwhA2_HEQMY8U0E", authDomain: "gadedporo.firebaseapp.com", databaseURL: "https://gadedporo-default-rtdb.firebaseio.com", projectId: "gadedporo", storageBucket: "gadedporo.firebasestorage.app", messagingSenderId: "280565731865", appId: "1:280565731865:web:b406a75969a77b53bd5088" };
     firebase.initializeApp(firebaseConfig);
@@ -214,37 +209,75 @@
     function setChip(amt, el) { curChip = amt; document.querySelectorAll('.game-1 .chip').forEach(c => c.classList.remove('selected')); el.classList.add('selected'); }
     function copyID() { navigator.clipboard.writeText(myUID); alert("ID Copied!"); }
     function clearBets() { if(isSpinning) return; for(let i=0;i<8;i++){ if(bets[i]>0){ balance+=bets[i]; bets[i]=0; document.getElementById(`bv-${i}`).innerText="0"; } } database.ref('players/'+myUID).update({balance}); updateBalanceUI(); }
-    function updateBalanceUI() { document.getElementById('balance').innerText=balance.toLocaleString(); }
-    
-    database.ref('players/'+myUID).on('value', s => { if(s.exists()){ let d = s.val(); balance=d.balance; wallet=d.wallet||0; document.getElementById('balance').innerText=balance.toLocaleString(); document.getElementById('wallet-val').innerText=`$${wallet.toFixed(2)}`; if(d.pfp) { document.getElementById('my-pfp').src = d.pfp; document.getElementById('my-pfp2').src = d.pfp; } } else { database.ref('players/'+myUID).set({balance:20000, wallet:0, pfp:"https://cdn-icons-png.flaticon.com/512/149/149071.png"}); } });
-    
-    database.ref('global/history').on('value', s => { if(s.exists()){ let h=''; s.val().slice(-20).reverse().forEach(x=> h+=`<div class="hist-item">${x}</div>`); document.getElementById('history-bar').innerHTML=h; } });
-    
-    function getTodayKey() { return new Date().toISOString().slice(0, 10); }
-    
-    database.ref('daily_leaderboard/'+getTodayKey()).orderByChild('w').limitToLast(24).on('value', s => { let l=[]; s.forEach(p=>{if(p.val().w>0)l.push(p.val())}); l.sort((a,b)=>b.w-a.w); let h=''; l.forEach(u=> h+=`<div class="lb-row"><div class="lb-info"><img class="lb-img" src="${u.pfp||'https://cdn-icons-png.flaticon.com/512/149/149071.png'}"><span>${u.id}</span></div><span style="color:gold">${u.w.toLocaleString()}</span></div>`); document.getElementById('lb-list').innerHTML=h; });
-</script>
-<script>
-    const container = document.getElementById('slots-container'); 
-    items.forEach((it, i) => { const angle = (i/8)*Math.PI*2; const div = document.createElement('div'); div.className='slot'; div.id=`slot-${i}`; div.style.left=(110+110*Math.cos(angle-Math.PI/2))+'px'; div.style.top=(110+110*Math.sin(angle-Math.PI/2))+'px'; div.innerHTML=`<div class="hot-label">HOT</div><span>${it.n}</span><b style="font-size:10px;color:gold">${it.m}x</b><div class="bet-txt" id="bv-${i}">0</div>`; div.onclick=()=>{ if(isSpinning||balance<curChip) return; if(bets.filter(b => b > 0).length >= 6 && bets[i] == 0) { alert("Max 6 slots!"); return; } balance-=curChip; bets[i]+=curChip; document.getElementById(`bv-${i}`).innerText=bets[i].toLocaleString(); database.ref('players/'+myUID).update({balance}); database.ref('live_bets/'+i+'/'+myUID).set(bets[i]); }; container.appendChild(div); });
-    
-    function syncServer() { setInterval(() => { const now = Date.now(); const timeLeft = 30 - (Math.floor(now / 1000) % 30); document.getElementById('timer').innerText = timeLeft < 10 ? "0"+timeLeft : timeLeft; document.getElementById('round-text').innerHTML = "ROUND " + (Math.floor(now/30000)%5000+1); if(!isSpinning){ let hotIdx = (Math.floor(now / 10000) % 8); document.querySelectorAll('.slot').forEach(s => s.classList.remove('hot-border')); document.querySelectorAll('.hot-label').forEach(l => l.style.display = 'none'); if(timeLeft > 3) { let t = document.getElementById(`slot-${hotIdx}`); t.classList.add('hot-border'); t.querySelector('.hot-label').style.display = 'block'; } } if (timeLeft === 1 && !isSpinning) runSpin(Math.floor(now/30000)); }, 1000); }
-    
-    function runSpin(r) { isSpinning = true; let idx = (function(round) { let s = round * 543.21; let val = Math.abs((Math.sin(s) * 10000) % 202); let c = 0; for (let i = 0; i < items.length; i++) { c += items[i].w; if (val <= c) return i; } return 0; })(r); let step = 0; let intv = setInterval(() => { document.querySelectorAll('.slot').forEach(s=>s.classList.remove('active-spin')); document.getElementById(`slot-${step%8}`).classList.add('active-spin'); if(step++ >= 30+idx){ clearInterval(intv); endRound(idx); } }, 80); }
-    
-    async function endRound(idx) { let win = bets[idx]*items[idx].m; let today = getTodayKey(); database.ref('players/'+myUID).update({balance: balance + win}); if(win > 0) { database.ref('daily_leaderboard/'+today+'/'+myUID).once('value', s => { let oldW = s.exists() ? s.val().w : 0; database.ref('daily_leaderboard/'+today+'/'+myUID).set({id:myUID, w:oldW+win, pfp: document.getElementById('my-pfp').src}); }); } document.getElementById('pop-res-icon').innerText=items[idx].n; document.getElementById('pop-my-bet').innerText=bets[idx].toLocaleString(); document.getElementById('pop-my-win').innerText=win.toLocaleString(); const snap = await database.ref('live_bets/'+idx).once('value'); let winners = []; if(snap.exists()){ const pSnap = await database.ref('players').once('value'); snap.forEach(u => { let d = pSnap.child(u.key).val(); winners.push({id:u.key, a:u.val()*items[idx].m, pfp: d?d.pfp:""}); }); } winners.sort((a,b)=>b.a-a.a); let h = ''; winners.slice(0,3).forEach((w,i)=> { let rank = i===0?"🥇":i===1?"🥈":"🥉"; h+=`<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:5px;"><div style="display:flex; align-items:center; gap:8px;"><span>${rank}</span><img src="${w.pfp||'https://cdn-icons-png.flaticon.com/512/149/149071.png'}" class="win-pfp"><span>${w.id}</span></div><b style="color:lime">+${w.a.toLocaleString()}</b></div>`; }); document.getElementById('pop-winners').innerHTML=h || "<center>No winners</center>"; document.getElementById('win-popup').style.display='block'; document.getElementById(`slot-${idx}`).classList.add('win-glow'); database.ref('global/history').once('value', s => { let arr = s.exists() ? s.val() : []; arr.push(items[idx].n); if(arr.length>30) arr.shift(); database.ref('global/history').set(arr); }); setTimeout(() => { isSpinning = false; document.getElementById('win-popup').style.display='none'; document.querySelectorAll('.slot').forEach(s=>s.classList.remove('win-glow','active-spin')); document.querySelectorAll('.bet-txt').forEach(t=>t.innerText="0"); bets.fill(0); if(myUID.includes("ID1")) database.ref('live_bets').remove(); }, 6000); }
+    function updateBalanceUI() { document.getElementById('balance').innerText=balance.toLocaleString(); }database.ref('players/'+myUID).on('value', s => { if(s.exists()){ let d = s.val(); balance=d.balance; wallet=d.wallet||0; document.getElementById('balance').innerText=balance.toLocaleString(); document.getElementById('wallet-val').innerText=`$${wallet.toFixed(2)}`; if(d.pfp) { document.getElementById('my-pfp').src = d.pfp; document.getElementById('my-pfp2').src = d.pfp; } } else { database.ref('players/'+myUID).set({balance:20000, wallet:0, pfp:"https://cdn-icons-png.flaticon.com/512/149/149071.png"}); } });
+
+database.ref('global/history').on('value', s => { if(s.exists()){ let h=''; s.val().slice(-20).reverse().forEach(x=> h+=`<div class="hist-item">${x}</div>`); document.getElementById('history-bar').innerHTML=h; } });
+
+function getTodayKey() { return new Date().toISOString().slice(0, 10); }
+
+database.ref('daily_leaderboard/'+getTodayKey()).orderByChild('w').limitToLast(24).on('value', s => { let l=[]; s.forEach(p=>{if(p.val().w>0)l.push(p.val())}); l.sort((a,b)=>b.w-a.w); let h=''; l.forEach(u=> h+=`<div class="lb-row"><div class="lb-info"><img class="lb-img" src="${u.pfp||'https://cdn-icons-png.flaticon.com/512/149/149071.png'}"><span>${u.id}</span></div><span style="color:gold">${u.w.toLocaleString()}</span></div>`); document.getElementById('lb-list').innerHTML=h; });const container = document.getElementById('slots-container'); 
+items.forEach((it, i) => { const angle = (i/8)*Math.PI*2; const div = document.createElement('div'); div.className='slot'; div.id=`slot-${i}`; div.style.left=(110+110*Math.cos(angle-Math.PI/2))+'px'; div.style.top=(110+110*Math.sin(angle-Math.PI/2))+'px'; div.innerHTML=`<div class="hot-label">HOT</div><span>${it.n}</span><b style="font-size:10px;color:gold">${it.m}x</b><div class="bet-txt" id="bv-${i}">0</div>`; div.onclick=()=>{ if(isSpinning||balance<curChip) return; if(bets.filter(b => b > 0).length >= 6 && bets[i] == 0) { alert("Max 6 slots!"); return; } balance-=curChip; bets[i]+=curChip; document.getElementById(`bv-${i}`).innerText=bets[i].toLocaleString(); database.ref('players/'+myUID).update({balance}); database.ref('live_bets/'+i+'/'+myUID).set(bets[i]); }; container.appendChild(div); });
+
+function syncServer() { setInterval(() => { const now = Date.now(); const timeLeft = 30 - (Math.floor(now / 1000) % 30); document.getElementById('timer').innerText = timeLeft < 10 ? "0"+timeLeft : timeLeft; document.getElementById('round-text').innerHTML = "ROUND " + (Math.floor(now/30000)%5000+1); if(!isSpinning){ let hotIdx = (Math.floor(now / 10000) % 8); document.querySelectorAll('.slot').forEach(s => s.classList.remove('hot-border')); document.querySelectorAll('.hot-label').forEach(l => l.style.display = 'none'); if(timeLeft > 3) { let t = document.getElementById(`slot-${hotIdx}`); t.classList.add('hot-border'); t.querySelector('.hot-label').style.display = 'block'; } } if (timeLeft === 1 && !isSpinning) runSpin(Math.floor(now/30000)); }, 1000); }
+
+function runSpin(r) { isSpinning = true; let idx = (function(round) { let s = round * 543.21; let val = Math.abs((Math.sin(s) * 10000) % 202); let c = 0; for (let i = 0; i < items.length; i++) { c += items[i].w; if (val <= c) return i; } return 0; })(r); let step = 0; let intv = setInterval(() => { document.querySelectorAll('.slot').forEach(s=>s.classList.remove('active-spin')); document.getElementById(`slot-${step%8}`).classList.add('active-spin'); if(step++ >= 30+idx){ clearInterval(intv); endRound(idx); } }, 80); }    async function endRound(idx) { 
+        let win = bets[idx]*items[idx].m; 
+        let today = getTodayKey(); 
+        database.ref('players/'+myUID).update({balance: balance + win}); 
+        if(win > 0) { 
+            database.ref('daily_leaderboard/'+today+'/'+myUID).once('value', s => { 
+                let oldW = s.exists() ? s.val().w : 0; 
+                database.ref('daily_leaderboard/'+today+'/'+myUID).set({id:myUID, w:oldW+win, pfp: document.getElementById('my-pfp').src}); 
+            }); 
+        } 
+        document.getElementById('pop-res-icon').innerText=items[idx].n; 
+        document.getElementById('pop-my-bet').innerText=bets[idx].toLocaleString(); 
+        document.getElementById('pop-my-win').innerText=win.toLocaleString(); 
+        const snap = await database.ref('live_bets/'+idx).once('value'); 
+        let winners = []; 
+        if(snap.exists()){ 
+            const pSnap = await database.ref('players').once('value'); 
+            snap.forEach(u => { 
+                let d = pSnap.child(u.key).val(); 
+                winners.push({id:u.key, a:u.val()*items[idx].m, pfp: d?d.pfp:""}); 
+            }); 
+        } 
+        winners.sort((a,b)=>b.a-a.a); 
+        let h = ''; 
+        winners.slice(0,3).forEach((w,i)=> { 
+            let rank = i===0?"🥇":i===1?"🥈":"🥉"; 
+            h+=`<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:5px;"><div style="display:flex; align-items:center; gap:8px;"><span>${rank}</span><img src="${w.pfp||'https://cdn-icons-png.flaticon.com/512/149/149071.png'}" class="win-pfp"><span>${w.id}</span></div><b style="color:lime">+${w.a.toLocaleString()}</b></div>`; 
+        }); 
+        document.getElementById('pop-winners').innerHTML = h || "<center>No winners</center>"; 
+        document.getElementById('win-popup').style.display='block'; 
+        document.getElementById(`slot-${idx}`).classList.add('win-glow'); 
+        database.ref('global/history').once('value', s => { 
+            let arr = s.exists() ? s.val() : []; 
+            arr.push(items[idx].n); 
+            if(arr.length>30) arr.shift(); 
+            database.ref('global/history').set(arr); 
+        }); 
+        setTimeout(() => { 
+            isSpinning = false; 
+            document.getElementById('win-popup').style.display='none'; 
+            document.querySelectorAll('.slot').forEach(s=>s.classList.remove('win-glow','active-spin')); 
+            document.querySelectorAll('.bet-txt').forEach(t=>t.innerText="0"); 
+            bets.fill(0); 
+            // পরের রাউন্ডের জন্য live_bets সম্পূর্ণ ক্লিয়ার করুন
+            database.ref('live_bets').remove();
+        }, 6000); 
+    }
     
     function doC2D(){ let amt = parseInt(document.getElementById('c2d-in').value); if(balance>=amt && amt>=10000){ balance-=amt; wallet+=(amt/10000); database.ref('players/'+myUID).update({balance, wallet}); alert("Success!"); } else alert("Min 10,000 Coins!"); }
     function doD2C(){ let amt = parseFloat(document.getElementById('d2c-in').value); if(wallet>=amt && amt>0){ wallet-=amt; balance+=(amt*7000); database.ref('players/'+myUID).update({balance, wallet}); alert("Success!"); } else alert("Insufficient Wallet!"); }
     function doWithdraw(){ let n = document.getElementById('wd-num').value; if(wallet>=30 && n.length>=10){ wallet=0; database.ref('players/'+myUID).update({wallet:0}); alert("Withdraw Request Sent!"); closeModal('exc-modal'); } else alert("Min $30 and valid number!"); }
     
     syncServer();
-</script>
-<script>
+</script><script>
     // গেম ২ ভেরিয়েবল
     let balance2 = 0, currentChip2 = 100, bets2 = {watermelon:0, lucky77:0, jam:0}, isSpinning2 = false, rotation2 = 0;
     let currentRound = 1, roundDuration = 12000, roundStartTime = 0, timeLeft2 = 12, roundInterval = null;
-    let pendingResult = null;  // result stored until spin finishes
+    let pendingResult = null;
     let spinEndTimer = null;
     const items2 = [{t:'watermelon', i:'🍉'},{t:'jam', i:'🍇'},{t:'watermelon', i:'🍉'},{t:'lucky77', i:'77'},{t:'jam', i:'🍇'}];
     
@@ -272,7 +305,6 @@
         document.getElementById('time-circle').innerText = timeLeft2;
         document.getElementById('ru-text').innerText = "RU: " + currentRound;
         if (timeLeft2 <= 0 && !isSpinning2) {
-            // round ends: start spin, but do NOT show popup yet
             startGame2Spin();
         }
     }
@@ -281,20 +313,15 @@
         if (isSpinning2) return;
         isSpinning2 = true;
         const result = getResultForRound(currentRound);
-        pendingResult = result; // save for later
+        pendingResult = result;
         const targetIdx = result.index;
         rotation2 += (360 * 10) + (360 - (targetIdx * 72)) - (rotation2 % 360);
         wheel2.style.transform = `rotate(${rotation2}deg)`;
-        
-        // clear any previous timer
         if (spinEndTimer) clearTimeout(spinEndTimer);
-        // wait for wheel animation (7 seconds)
         spinEndTimer = setTimeout(() => {
             finishGame2Spin(pendingResult);
         }, 7000);
-    }
-    
-    async function finishGame2Spin(result) {
+    }    async function finishGame2Spin(result) {
         if (!result) return;
         const isDouble = result.doubleBonus;
         const targetType = result.type;
@@ -372,7 +399,7 @@
     }
     
     function placeBet(t) {
-        if(isSpinning2) { alert("গেম চলছে, দয়া করে অপেক্ষা করুন"); return; }
+        if(isSpinning2) { alert("গেম চলছে, দয়া করে অপেক্ষা করুন"); return; }
         if(balance2 < currentChip2) { alert("ব্যালেন্স কম!"); return; }
         let activeSlots = (bets2.watermelon>0?1:0)+(bets2.lucky77>0?1:0)+(bets2.jam>0?1:0);
         if(activeSlots >= 2 && bets2[t] === 0) { alert("শুধু ২টি স্লটে বেট করা যাবে!"); return; }
@@ -409,7 +436,7 @@
     roundInterval = setInterval(syncGame2Round, 200);
 </script>
 <script>
-    // গেম টগল (সুইচ বাটন কাজ করবে - উভয় দিকেই)
+    // গেম টগল
     const game1Div = document.getElementById('game1Container');
     const game2Div = document.getElementById('game2Container');
     const toggleBtn = document.getElementById('toggleGameBtn');
@@ -417,7 +444,7 @@
     function switchToGame1() { game1Div.style.display = 'block'; game2Div.style.display = 'none'; toggleBtn.innerHTML = '77'; isGame1Active = true; }
     function switchToGame2() { game1Div.style.display = 'none'; game2Div.style.display = 'block'; toggleBtn.innerHTML = '🎲'; isGame1Active = false; }
     toggleBtn.addEventListener('click', () => { isGame1Active ? switchToGame2() : switchToGame1(); });
-    switchToGame1(); // ডিফল্ট গেম ১
+    switchToGame1();
 </script>
 </body>
 </html>
