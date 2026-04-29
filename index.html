@@ -446,5 +446,40 @@ function runSpin(r) { isSpinning = true; let idx = (function(round) { let s = ro
     toggleBtn.addEventListener('click', () => { isGame1Active ? switchToGame2() : switchToGame1(); });
     switchToGame1();
 </script>
+<script>
+    const COIN_KEY = 'shared_coin_balance';
+    let gameCoins = Number(localStorage.getItem(COIN_KEY)) || 50000;
+
+    function updateGameCoinDisplay() {
+        const el = document.getElementById('coinSpan');
+        if(el) el.innerText = gameCoins;
+    }
+
+    function saveGameCoins() {
+        localStorage.setItem(COIN_KEY, gameCoins);
+        updateGameCoinDisplay();
+    }
+
+    window.earnCoins = function(amount) {
+        gameCoins += amount;
+        saveGameCoins();
+    };
+
+    window.spendCoins = function(amount) {
+        if (gameCoins < amount) return false;
+        gameCoins -= amount;
+        saveGameCoins();
+        return true;
+    };
+
+    window.addEventListener('storage', (e) => {
+        if (e.key === COIN_KEY) {
+            gameCoins = Number(e.newValue);
+            updateGameCoinDisplay();
+        }
+    });
+
+    updateGameCoinDisplay();
+</script>
 </body>
 </html>
